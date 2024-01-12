@@ -220,6 +220,37 @@ mongo IPAddressRemoteComputer
 
 Create MongoDB `admin user`
 
+~~~json
+cls //alias: clear (clear the current terminal session)
+
+use admin //switch to the database named: admin
+
+// create a user named: admin
+db.createUser
+(
+    {
+        "user": "admin"
+        ,"pwd": "securePassword"
+        ,"roles":
+        [
+            "role": "root"
+            ,"db": "admin"
+        ]
+    }
+);
+
+show users //retrieve all users in the dtabase: admin
+
+exit //leave the mongosh terminal
+~~~
+
+Enable authorization on the mongodb server by editing the mongodb configuration file.
+~~~ps1
+
+~~~
+
+
+
 
 
 
