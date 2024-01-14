@@ -121,39 +121,87 @@ NB: MongoDB server and MongoDB shell support SSL encryption. It is highly recomm
 You can install MongoDB
 
 Locally on your PC (not scalable, not reliable):
-- It is a single server
-- It is suitable for educational or development purpose
-- It is not suitable for production applications
+- :circle_green: It is a single server
+- :circle_green: It is suitable for educational or development purpose
+- :circle_red: It is not suitable for production applications
 
 By using Dedicated or Virtual managed servers:
-- You have a full control
-- It come with management overhead (manual scalability)
+- :circle_green: You have a full control
+- :circle_red: It come with management overhead (manual scalability)
 
 By using Cloud Databases as a service:
-- It is suitable for production applications
-- It offers a replica-set out of the box
-- It is easy to manage and to scale
-- It offers free size-limited options available
+- :circle_green: It is suitable for production applications
+- :circle_green: It offers a replica-set out of the box
+- :circle_green: It is easy to manage and to scale
+- :circle_red:  It offers free size-limited options available
 
-### Install MongoDB on Windows:
+### Install MongoDB on Windows using the PowerShell command line:
 
-Download MongoDB server here: https://www.mongodb.com/try/download/community
-
-Set up the MongoDB environment
+:circle_blue: Retrieve all available Mongodb packages
 ~~~ps1
-# Run PowerShell as administrator
+winget search --name mongodb
+
+<# EXAMPLE OUTPUT
+Name                            Id                         Version  Source
+--------------------------------------------------------------------------
+MongoDB                          MongoDB.Server            6.0.6    winget
+NoSQLBooster for MongoDB         NoSQLBooster.NoSQLBooster 6.2.17   winget
+MongoDB Shell                    MongoDB.Shell             1.10.1   winget
+MongoDB CLI                      MongoDB.MongoDBCLI        1.30.0   winget
+MongoDB Atlas CLI                MongoDB.MongoDBAtlasCLI   1.5.1    winget
+MongoDB Tools                    MongoDB.DatabaseTools     100.7.3  winget
+MongoDB Compass Readonly         MongoDB.Compass.Readonly  1.41.0.0 winget
+MongoDB Compass Isolated Edition MongoDB.Compass.Isolated  1.41.0.0 winget
+MongoDB Compass                  MongoDB.Compass.Full      1.41.0.0 winget
+MongoDB Compass Community        MongoDB.Compass.Community 1.41.0   winget
+#>
+~~~
+
+:circle_blue: Install MongoDB server
+~~~ps1
+<# 
+Installs the selected package, either found by searching a configured source or directly from a manifest. By default, the query must case-insensitively match the id, name, or moniker of the package.
+--id                                 Filter results by id.
+-e,--exact                           Find package using exact match
+-s,--source                          Find package using the specified source.
+#>
+winget install --id MongoDB.Server --exact --source winget
+
+<#EXAMPLE OUTPUT
+Found MongoDB [MongoDB.Server] Version 6.0.6
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-6.0.6-signed.msi
+  ██████████████████████████████   481 MB /  481 MB
+Successfully verified installer hash
+Starting package install...
+Successfully installed
+#>
+~~~
+
+:circle_blue: Install MongoDB Compass Community
+~~~ps1
+winget install --id MongoDB.Compass.Community --exact --source winget
+~~~
+
+~~~ps1
 # Create the MongoDB source directory
 New-Item -ItemType Directory "\data\db"
+~~~
 
-# Launch MongoDB server
+Launch MongoDB server
+~~~
 "C:\Program Files\MongoDB\Server\3.x\bin\mongod.exe"
 #OUTPUT: connecting to: mongodb://127.0.01:27017
+~~~
 
-# Launch MongoDB shell
+Launch MongoDB shell
+~~~ps1
 "C:\Program Files\MongoDB\Server\3.x\bin\mongo.exe"
 # You should be connected to mongo shell if successful
 ~~~
 
+Retrieve the MongoDB version
 ~~~mongosh
 # Check the mongodb version
 db.version()
