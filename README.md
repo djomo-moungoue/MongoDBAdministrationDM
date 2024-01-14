@@ -121,23 +121,23 @@ NB: MongoDB server and MongoDB shell support SSL encryption. It is highly recomm
 You can install MongoDB
 
 Locally on your PC (not scalable, not reliable):
-- :circle_green: It is a single server
-- :circle_green: It is suitable for educational or development purpose
-- :circle_red: It is not suitable for production applications
+- :green_circle: It is a single server
+- :green_circle: It is suitable for educational or development purpose
+- :red_circle: It is not suitable for production applications
 
 By using Dedicated or Virtual managed servers:
-- :circle_green: You have a full control
-- :circle_red: It come with management overhead (manual scalability)
+- :green_circle: You have a full control
+- :red_circle: It come with management overhead (manual scalability)
 
 By using Cloud Databases as a service:
-- :circle_green: It is suitable for production applications
-- :circle_green: It offers a replica-set out of the box
-- :circle_green: It is easy to manage and to scale
-- :circle_red:  It offers free size-limited options available
+- :green_circle: It is suitable for production applications
+- :green_circle: It offers a replica-set out of the box
+- :green_circle: It is easy to manage and to scale
+- :red_circle:  It offers free size-limited options available
 
 ### Install MongoDB on Windows using the PowerShell command line:
 
-:circle_blue: Retrieve all available Mongodb packages
+:blue_circle: Retrieve all available Mongodb packages
 ~~~ps1
 winget search --name mongodb
 
@@ -157,7 +157,7 @@ MongoDB Compass Community        MongoDB.Compass.Community 1.41.0   winget
 #>
 ~~~
 
-:circle_blue: Install MongoDB server
+:blue_circle: Install MongoDB server
 ~~~ps1
 <# 
 Installs the selected package, either found by searching a configured source or directly from a manifest. By default, the query must case-insensitively match the id, name, or moniker of the package.
@@ -179,7 +179,7 @@ Successfully installed
 #>
 ~~~
 
-:circle_blue: Install MongoDB Compass Community
+:blue_circle: Install MongoDB Compass Community
 ~~~ps1
 winget install --id MongoDB.Compass.Community --exact --source winget
 ~~~
