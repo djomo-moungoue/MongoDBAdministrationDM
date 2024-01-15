@@ -354,38 +354,11 @@ Connect to a MongoDB server located on a remote computer in the same network
 mongo IPAddressRemoteComputer
 ~~~
 
-### Administrate MongoDB Usrers
+## Data Persistence
 
-Create MongoDB `admin user`
+.\DataPersitence\DatabaseArchitecture.md
 
-~~~json
-cls //alias: clear (clear the current terminal session)
 
-use admin //switch to the database named: admin
-
-// create a user named: admin
-db.createUser
-(
-    {
-        "user": "admin"
-        ,"pwd": "securePassword"
-        ,"roles":
-        [
-            "role": "root"
-            ,"db": "admin"
-        ]
-    }
-);
-
-show users //retrieve all users in the dtabase: admin
-
-exit //leave the mongosh terminal
-~~~
-
-Enable authorization on the mongodb server by editing the mongodb configuration file.
-~~~ps1
-
-~~~
 
 
 
