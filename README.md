@@ -356,98 +356,11 @@ mongo IPAddressRemoteComputer
 
 ## Data Persistence
 
-## Database Architecture
+.\DataPersitence\DatabaseArchitecture.md
 
-db: MockDatabase
-- collection: MockBatches
-- collection: MockDocs
-- collection: MockUsers
-{
-    "Name":String()
-    ,"FirstName":String()
-    ,"Account":String()
-    ,"Password":String()
-    ,"Email":String()
-    ,"LastAccess":Date()
-    ,"OldPassword":String()
-    ,"LastPasswordChange":Date()
-    ,"LastSource":String()
-    ,"LastActivity":Date()
-    ,"LoggedIn":Date()
-    ,"LoggedOut":Date()
-    ,"LayoutLanguage":String()
-    ,"LayoutOrientation":String()
-    ,"LayoutAlignment":String()
-    ,"UserLevel":String()
-    ,"HeaderThme":String()
-    ,"PanelThme":String()
-    ,"LogoThme":String()
-    ,"EditorThme":String()
-    ,"MockRole":DBRef("MockRoles", "ID")
-    ,"Units":Array()
-    ,"Groups":Array()
-    ,"AssignmentRules":Array()
-    ,"UserClaims":Object()
-    ,"CreatedDate":Date()
-    ,"CreatedSource":String()
-    ,"Disabled":Boolean
-    ,"_class":String()
-    ,"MockUnit":DBRef("MockUnits", "ID")
-    ,"MockLocation":DBRef("MockLocations","ID")
-    ,"MockDefaultGroup":DBRef("MockGroups", "ID")
-}
-- collection: MockRoles
-{
 
-}
-- collection: MockOrganizations
-- collection: MockLocations
-- collection: MockGroups
-- collection: MockUnits
-{
-    "Name":String()
-    ,"Disabled":Boolean
-    ,"MockOrganization":DBRef("MockOrganizations", "ID")
-    ,"MockLocation":DBRef("MockLocations","ID")
-    ,"Users":Array()
-    ,"Groups":Array()
-    ,"AssignmentRules":Array()
-    ,"Mailboxes":Array()
-    ,"_class":String()
-}
 
-### Administrate MongoDB Usrers
 
-Create MongoDB `admin user`
-
-~~~json
-cls //alias: clear (clear the current terminal session)
-
-use admin //switch to the database named: admin
-
-// create a user named: admin
-db.createUser
-(
-    {
-        "user": "admin"
-        ,"pwd": "securePassword"
-        ,"roles":
-        [
-            "role": "root"
-            ,"db": "admin"
-        ]
-    }
-);
-
-show users //retrieve all users in the dtabase: admin
-
-exit //leave the mongosh terminal
-~~~
-
-Enable authorization on the mongodb server by editing the mongodb configuration file.
-~~~ps1
-
-~~~
 
 
 

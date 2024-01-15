@@ -1,0 +1,253 @@
+# Database Architecture
+
+MockDatabase.MockBatches
+~~~json
+// MockBatch: is a group of related mocked documents, files or recording.
+{
+    "Name":String()
+    ,"MockPhysicalReference":String()
+    ,"Account":String()
+    ,"Source":String()
+    ,"MockUnit":Object()
+    ,"FileCount":Int32()
+    ,"Available":Date()
+    ,"Scanned":Date()
+    ,"LastAccess":Date()
+    ,"Created":Date()
+    ,"Registered":Date()
+    ,"Extracted":Date()
+    ,"TransactionsImported":Int32()
+    ,"DocumentsImported":Int32()
+    ,"PagesImported":Int32()
+    ,"TransactionsExported":Int32()
+    ,"DocumentsExported":Int32()
+    ,"PagesExported":Int32()
+    ,"MockBatchTarget":String()
+    ,"Priority":String()
+    ,"Activity":String()
+    ,"ActivityState":String()
+    ,"ActivityExpire":Date()
+    ,"MockDocs":Object()
+    ,"Histories":Array()
+    ,"_class":String()  
+}
+~~~
+
+MockDatabase.MockDocs
+~~~json
+// MockDoc: is a single mocked document, file or recording.
+{
+    "Account":String()
+    ,"AccountRole":String()
+    ,"Activated":Mixed()
+    ,"Activity":String()
+    ,"ActivityExpire":Date()
+    ,"ActivityResult":String()
+    ,"ActivityState":String()
+    ,"MockBatchID":String()
+    ,"MockBatchReference":String()
+    ,"MockBox":String()
+    ,"MockPhysicalReference":String()
+    ,"Priority":String()
+    ,"MockProduct":Object()
+    ,"MockProductName":String()
+    ,"MockUnitName":String()
+    ,"MockUnit":Object()
+    ,"CarbonCopy":String()
+    ,"Created":Date()
+    ,"Validated":Date()
+    ,"DocumentCount":Int32()
+    ,"PageCount":Int32()
+    ,"Extracted":Date()
+    ,"Histories":Array()
+    ,"Host":String()
+    ,"MockDocTarget":String()
+    ,"LastAccess":Date()
+    ,"Registered":Date()
+    ,"Scanned":Date()
+    ,"Exported":Date()
+    ,"Signed":Date()
+    ,"Transferred":Date()
+    ,"Completed":Date()
+    ,"MessageText":String()
+    ,"SplitDocument":String()
+    ,"TransactionId":String()
+    ,"_class":String()  
+}
+~~~
+
+MockDatabase.MocProducts
+~~~json
+// MockProduct: is a type of physical document, file or recording.
+{
+    "Name":String()
+    ,"DisplayName":String()
+    ,"Description":String()
+    ,"Priority":String()
+    ,"_class":String()  
+    ,"FormHeight":String()
+    ,"FormProportion":String()
+    ,"Preview":Boolean()
+    ,"AssignmentRules":Array()
+    ,"Parameters":Array()
+    ,"TimeToLive":Int32()
+    ,"LanguageFrench":Boolean()
+    ,"LanguageFeefee":Boolean()
+}
+~~~
+
+MockDatabase.MockUsers
+~~~json
+// MockUser: is a single mocked user
+{
+    "Name":String()
+    ,"FirstName":String()
+    ,"Account":String()
+    ,"Password":String()
+    ,"Email":String()
+    ,"LastAccess":Date()
+    ,"OldPassword":String()
+    ,"LastPasswordChange":Date()
+    ,"LastSource":String()
+    ,"LastActivity":Date()
+    ,"LoggedIn":Date()
+    ,"LoggedOut":Date()
+    ,"LayoutLanguage":String()
+    ,"LayoutOrientation":String()
+    ,"LayoutAlignment":String()
+    ,"UserLevel":String()
+    ,"HeaderThme":String()
+    ,"PanelThme":String()
+    ,"LogoThme":String()
+    ,"EditorThme":String()
+    ,"MockRole":DBRef("MockRoles", "ID")
+    ,"Units":Array()
+    ,"Groups":Array()
+    ,"AssignmentRules":Array()
+    ,"UserClaims":Object()
+    ,"CreatedDate":Date()
+    ,"CreatedSource":String()
+    ,"Disabled":Boolean
+    ,"_class":String()
+    ,"MockUnit":DBRef("MockUnits", "ID")
+    ,"MockLocation":DBRef("MockLocations","ID")
+    ,"MockDefaultGroup":DBRef("MockGroups", "ID")
+}
+~~~
+
+MockDatabase.MockRoles
+~~~json
+{
+    "Name":String()
+    ,"LoginTimeout":Int32()
+    ,"Description":String()
+    ,"Users":Array()
+    ,"Configuration":Boolean()
+    ,"ConfigurationAllMockUnits":Boolean()
+    ,"ConfigurationMockUnit":Boolean()
+    ,"ConfigurationMockOrganziation":Boolean()
+    ,"ConfigurationMockLocation":Boolean()
+    ,"ConfigurationAllMockMailbox":Boolean()
+    ,"ConfigurationAllMock":Boolean()
+    ,"UserManagement":Boolean()
+    ,"AssignmentRule":Boolean()
+    ,"Coding":Boolean()
+    ,"SupervisorCoding":Boolean()
+    ,"Coding":Boolean()
+    ,"SupervisorCoding":Boolean()
+    ,"Clearing":Boolean()
+    ,"SupervisorClearing":Boolean()
+    ,"Statistics":Boolean()
+    ,"StatisticsUsers":Boolean()
+    ,"StatisticsEvents":Boolean()
+    ,"StatisticsReports":Boolean()
+    ,"CustomReports":Boolean()
+    ,"Documents":Boolean()
+    ,"Pages":Boolean()
+    ,"Operators":Boolean()
+    ,"Administration":Boolean()
+    ,"Rescan":Boolean()
+    ,"VirtualRescan":Boolean()
+    ,"Registration":Boolean()
+    ,"StructureCorrection":Boolean()
+    ,"Supervision":Boolean()
+    ,"SupervisionInventory":Boolean()
+    ,"SupervisionSystem":Boolean()
+    ,"SupervisionUser":Boolean()
+    ,"SupervisionSimulation":Boolean()
+    ,"SupervisionLookup":Boolean()
+    ,"SupervisionAllUnits":Boolean()
+    ,"SupervisionInventoryDate":Boolean()
+    ,"UploadConfiguration":Boolean()
+    ,"Release":Boolean()
+    ,"OriginalDocument":Boolean()
+    ,"StructureChangeTransaction":Boolean()
+    ,"StructureChangeDocument":Boolean()
+    ,"StructureDeleteDocument":Boolean()
+    ,"StructureChangeOrder":Boolean()
+    ,"StructureDeletePage":Boolean()
+    ,"StructureRejectPage":Boolean()
+    ,"SupervisionBatch":Boolean()
+    ,"SupervisionBatchDetete":Boolean()
+    ,"SupervisionBatchExtract":Boolean()
+    ,"SupervisionBatchImport":Boolean()
+    ,"SupervisionBatchExport":Boolean()
+    ,"SupervisionBatchWait":Boolean()
+    ,"SupervisionBatchAvailable":Boolean()
+    ,"SupervisionBatchSelectAll":Boolean()
+    ,"SupervisionBatchActivitiesDelete":Boolean()
+    ,"SupervisionBatchActivitiesForward":Boolean()
+    ,"SupervisionBatchActivitiesWait":Boolean()
+    ,"SupervisionBatchActivitiesAvailable":Boolean()
+    ,"KeyingSimulation":Boolean()
+    ,"Password":String()
+    ,"_class":String()
+}
+~~~
+
+MockDatabase.MockOrganizations
+~~~json
+{
+    "Name":String()
+    ,"MockUnits":Array()
+    ,"_class":String()    
+}
+~~~
+
+MockDatabase.MockLocations
+~~~json
+{
+    "Name":String()
+    ,"Units":Array()
+    ,"MockUsers":Array()
+    ,"_class":String()    
+}
+~~~
+
+MockDatabase.MockGroups
+~~~json
+{
+    "Name":String()
+    ,"Description":String()
+    ,"MockUnit":DBRef("MockUnits","ID")
+    ,"AssignmentRule":DBRef("AssignmentRules","ID")
+    ,"DefaultMockUsers":Array()
+    ,"MockUsers":Array()
+    ,"_class":String()
+}
+~~~
+
+MockDatabase.MockUnits
+~~~json
+{
+    "Name":String()
+    ,"Disabled":Boolean()
+    ,"MockOrganization":DBRef("MockOrganizations", "ID")
+    ,"MockLocation":DBRef("MockLocations","ID")
+    ,"Users":Array()
+    ,"Groups":Array()
+    ,"AssignmentRules":Array()
+    ,"Mailboxes":Array()
+    ,"_class":String()
+}
+~~~
