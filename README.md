@@ -283,71 +283,7 @@ MongoDBCompass.exe mongodb://root:root@localhost:27017 &
 ~~~
 
 
-Show available commands
-~~~mongosh
-help
 
-<#
-`use` : Set current database
-
-`show` :
-- 'show databases'/'show dbs': Print a list of all available databases.
-- 'show collections'/'show tables': Print a list of all collections for current database.
-- 'show profile': Prints system.profile information.
-- 'show users': Print a list of all users for current database.
-- 'show roles': Print a list of all roles for current database. 
-- 'show log <type>': log for current connection, if type is not set uses 'global' 'show logs': Print all logs.
-
-`exit`	Quit the MongoDB shell with exit/exit()/.exit
-
-`quit`	Quit the MongoDB shell with quit/quit()
-
-`Mongo`	Create a new connection and return the Mongo object. Usage: new Mongo(URI, options [optional])
-
-`connect`	Create a new connection and return the Database object. Usage: connect(URI, username [optional], password [optional])
-it	result of the last line evaluated; use to further iterate
-
-`version`	Shell version
-
-`load`	Loads and runs a JavaScript file into the current shell environment
-
-`enableTelemetry`	Enables collection of anonymous usage data to improve the mongosh CLI
-
-`disableTelemetry`	Disables collection of anonymous usage data to improve the mongosh CLI
-
-`passwordPrompt`	Prompts the user for a password
-
-`sleep`	Sleep for the specified number of milliseconds
-
-`print`	Prints the contents of an object to the output
-
-`printjson`	Alias for print()
-
-`convertShardKeyToHashed`	Returns the hashed value for the input using the same hashing function as a hashed index.
-
-`cls`	Clears the screen like console.clear()
-
-`isInteractive`	Returns whether the shell will enter or has entered interactive mode
-#>
-~~~
-
-Show the MongoDB Server version
-~~~mongosh
-db.version()
-<# Output example
-6.0.6
-#>
-~~~
-
-Print a list of all available databases
-~~~mongosh
-show databases //alias dbs
-<# Output example
-admin   40.00 KiB
-config  72.00 KiB
-local   72.00 KiB
-#>
-~~~
 
 #### :four: Create the data directory
 ~~~ps1
@@ -465,11 +401,184 @@ mongo "mongodb://root:root@ec2-34-216-244-19.us-west-2.compute.amazonaws.com/adm
 mongo "mongodb://cluster0-shard-00-00-fdpbt.mongodb.net:27017,cluster0-shard-00-01-fdpbt.mongodb.net:27017,cluster-00-02-fdpbt.net:27017/?replicatSet=Cluster0-shard-0" --ssl --authenticationDatabase admin -username root --password root
 ~~~
 
+## Explore Mongo DB Shell and Server
+
+### MongoDB Server
+
+MongoDB Server:
+- :one: Windows Service is named `MongoDB`
+- :two: daemon is named `Mongod`
+
+MongoDB Server Version
+~~~ps1
+mongod --version
+<# Output example
+db version v6.0.6
+Build Info: {
+    "version": "6.0.6",
+    "gitVersion": "26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7",
+    "modules": [],
+    "allocator": "tcmalloc",
+    "environment": {
+        "distmod": "windows",
+        "distarch": "x86_64",
+        "target_arch": "x86_64"
+    }
+}
+#>
+~~~
+
+Or
+
+~~~ps1
+mongosh
+
+db.version()
+# 6.0.6
+~~~
+
+Verify which JavaScript engine is used in you MongoDB Server
+~~~ps1
+mongosh
+
+db.serverBuildInfo()
+
+<# Output example
+{
+  version: '6.0.6',
+  gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7',
+  targetMinOS: 'Windows 7/Windows Server 2008 R2',
+  modules: [],
+  allocator: 'tcmalloc',
+  javascriptEngine: 'mozjs', //modernized JavaScript
+  sysInfo: 'deprecated',
+  versionArray: [ 6, 0, 6, 0 ],
+  openssl: { running: 'Windows SChannel' },
+  buildEnvironment: {
+    distmod: 'windows',
+    distarch: 'x86_64',
+    cc: 'cl: Microsoft (R) C/C++ Optimizing Compiler Version 19.31.31107 for x64',
+    ccflags: '/nologo /WX /FImongo/platform/basic.h /fp:strict /EHsc /W3 /wd4068 /wd4244 /wd4267 /wd4290 /wd4351 /wd4355 /wd4373 
+/wd4800 /wd4251 /wd4291 /we4013 /we4099 /we4930 /errorReport:none /MD /O2 /Oy- /bigobj /utf-8 /permissive- /Zc:__cplusplus /Zc:sizedDealloc /volatile:iso /diagnostics:caret /std:c++17 /Gw /Gy /Zc:inline',
+    cxx: 'cl: Microsoft (R) C/C++ Optimizing Compiler Version 19.31.31107 for x64',
+    cxxflags: '/TP',
+    linkflags: '/nologo /DEBUG /INCREMENTAL:NO /LARGEADDRESSAWARE /OPT:REF',
+    target_arch: 'x86_64',
+    target_os: 'windows',
+    cppdefines: 'SAFEINT_USE_INTRINSICS 0 PCRE_STATIC NDEBUG BOOST_ALL_NO_LIB _UNICODE UNICODE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS _CONSOLE _CRT_SECURE_NO_WARNINGS _ENABLE_EXTENDED_ALIGNED_STORAGE _SCL_SECURE_NO_WARNINGS _WIN32_WINNT 0x0A00 BOOST_USE_WINAPI_VERSION 0x0A00 NTDDI_VERSION 0x0A000000 BOOST_THREAD_VERSION 5 BOOST_THREAD_USES_DATETIME BOOST_SYSTEM_NO_DEPRECATED BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS BOOST_ENABLE_ASSERT_DEBUG_HANDLER BOOST_LOG_NO_SHORTHAND_NAMES BOOST_LOG_USE_NATIVE_SYSLOG BOOST_LOG_WITHOUT_THREAD_ATTR ABSL_FORCE_ALIGNED_ACCESS'
+  },
+  bits: 64,
+  debug: false,
+  maxBsonObjectSize: 16777216,
+  storageEngines: [ 'devnull', 'ephemeralForTest', 'wiredTiger' ],
+  ok: 1
+}
+#>
+~~~
+
+### MongoDB Shell
+
+MongoDB Shell:
+- :one: is based on JavaScript
+- :two: uses SpiderMonkey JavaScript engine starting from v3.2
+- :three: supports ECMAScript 6 (ES6) starting from v3.2
+- :four: supports mongo shell and server-side JavaScript
+- :five: uses `mongosh` in Windows OS and `mongo` in Linux and Mac OS to start his console
+
+MongoDB Shell Version
+~~~ps1
+mongosh --version
+# 1.10.1
+~~~
+
+Or
+
+~~~ps1
+mongosh
+
+version()
+# 1.10.1
+~~~
+
+Show available commands
+~~~mongosh
+help
+
+<#
+`use` : Set current database
+
+`show` :
+- 'show databases'/'show dbs': Print a list of all available databases.
+- 'show collections'/'show tables': Print a list of all collections for current database.
+- 'show profile': Prints system.profile information.
+- 'show users': Print a list of all users for current database.
+- 'show roles': Print a list of all roles for current database. 
+- 'show log <type>': log for current connection, if type is not set uses 'global' 'show logs': Print all logs.
+
+`exit`	Quit the MongoDB shell with exit/exit()/.exit
+
+`quit`	Quit the MongoDB shell with quit/quit()
+
+`Mongo`	Create a new connection and return the Mongo object. Usage: new Mongo(URI, options [optional])
+
+`connect`	Create a new connection and return the Database object. Usage: connect(URI, username [optional], password [optional])
+it	result of the last line evaluated; use to further iterate
+
+`version`	Shell version
+
+`load`	Loads and runs a JavaScript file into the current shell environment
+
+`enableTelemetry`	Enables collection of anonymous usage data to improve the mongosh CLI
+
+`disableTelemetry`	Disables collection of anonymous usage data to improve the mongosh CLI
+
+`passwordPrompt`	Prompts the user for a password
+
+`sleep`	Sleep for the specified number of milliseconds
+
+`print`	Prints the contents of an object to the output
+
+`printjson`	Alias for print()
+
+`convertShardKeyToHashed`	Returns the hashed value for the input using the same hashing function as a hashed index.
+
+`cls`	Clears the screen like console.clear()
+
+`isInteractive`	Returns whether the shell will enter or has entered interactive mode
+#>
+~~~
+
+Show all Database functions
+~~~ps1
+mongosh
+
+db. # press tab twice
+~~~
+
+#### Common CRUD and Administrartion Commmands
+
+|Create|Read|Update|Delete|
+|---|---|---|---|
+|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers()|
+|db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
+|db.createCollection|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
+|db.createView()||||
+|db.createEncryptedCollection()||||
+
+|Grant|Revoke|Manage|
+|---|---|---|
+|db.grantRolesToRole()|db.revokeRolesFromRole()|db.version(), db.getMongo(), db.serverBuildInfo()|
+|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(),db.listCommands()|
+|db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
 
+                
+  
+     
 
+            
 
-
-
-
-
+  
+                               
+          
+                                   
