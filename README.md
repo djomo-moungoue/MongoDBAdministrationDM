@@ -559,11 +559,11 @@ db. # press tab twice
 
 |Create|Read|Update|Delete|
 |---|---|---|---|
-|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers()|
+|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(),db.dropUser()|
 |db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|db.createCollection|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
+|db.createCollection(),db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
 |db.createView()||||
-|db.createEncryptedCollection()||||
+||||db.dropDatabase()|
 
 |Grant|Revoke|Manage|
 |---|---|---|
