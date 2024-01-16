@@ -559,16 +559,16 @@ db. # press tab twice
 
 |Create|Read|Update|Delete|
 |---|---|---|---|
-|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(),db.dropUser()|
+|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
 |db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|db.createCollection(),db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
+|db.createCollection(), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
 |db.createView()||||
 ||||db.dropDatabase()|
 
 |Grant|Revoke|Manage|
 |---|---|---|
 |db.grantRolesToRole()|db.revokeRolesFromRole()|db.version(), db.getMongo(), db.serverBuildInfo()|
-|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(),db.listCommands()|
+|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
 |db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
 
