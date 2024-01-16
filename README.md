@@ -53,11 +53,11 @@ Example:
 - (7) ObjectId
 - (8) and others.
 
-N.B.: `MongoDB` stores documents in `BSON format`. 
+:memo: `MongoDB` stores documents in `BSON format`. 
 
 The `extended JSON` is used to convert JSON to BSON and vice versa. It has a `shell mode` and a `strict mode` of operation:
 
-The `Shell Mode`:
+:memo: The `Shell Mode`:
 - uses inline `BSON` types
 - is the internal MongoDB mode
 - is compatible with MongoDB shell
@@ -70,7 +70,7 @@ The `Shell Mode`:
     }
     ~~~
 
-The `Strict Mode`:
+:memo: The `Strict Mode`:
  - represents BSON types using special key names prepended with $
  - is compatible with the `JSON` standard
  - is used in all JSON parsers
@@ -548,14 +548,52 @@ it	result of the last line evaluated; use to further iterate
 #>
 ~~~
 
-Show all Database functions
 ~~~ps1
 mongosh
 
-db. # press tab twice
+typeof db
+# Output: object
 ~~~
 
-#### Common CRUD and Administrartion Commmands
+Show all methods of the db object
+~~~ps1
+mongosh
+
+db. # press tab twice to show all methods of the db object
+db.c # press tab twice to show all commands having the prefix c
+~~~
+
+Show a function declaration
+~~~ps1
+mongosh
+
+db.version
+<# Output example
+[Function: version] AsyncFunction {
+  apiVersions: [ 0, 0 ],
+  returnsPromise: true,
+  serverVersions: [ '0.0.0', '999.999.999' ],
+  topologies: [ 'ReplSet', 'Sharded', 'LoadBalanced', 'Standalone' ],
+  returnType: { type: 'unknown', attributes: {} },
+  deprecated: false,
+  platforms: [ 'Compass', 'Browser', 'CLI' ],
+  isDirectShellCommand: false,
+  acceptsRawInput: false,
+  shellCommandCompleter: undefined,
+  help: [Function (anonymous)] Help
+}
+#>
+~~~
+
+Call a function
+~~~ps1
+mongosh
+
+db.version()
+# 6.0.6
+~~~
+
+#### Common CRUD and Administrartion Functions in the db Object
 
 |Create|Read|Update|Delete|
 |---|---|---|---|
@@ -571,6 +609,48 @@ db. # press tab twice
 |db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
 |db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
+
+## MongoDB BSON Data Types
+
+|Number ID|Type|Syntax|String ID|
+|---|---|---|---|
+|1|Double|0.0|"dbouble"|
+|2|String|""|"string"|
+|3|Object|{}|"object"|
+|4|Array|[]|""|
+|7|ObjectId|ObjectId()|"objectId"|
+|8|Boolean|true/false|"boolean"|
+|9|Date|ISODate()|"date"|
+|16|32-bit Integer|NumberInt()|"int"|
+|18|64-bit Integer|NumberLong()|"long"|
+
+:memo: Memo:
+:one:If type of Number is not specified, it will be stored as Double BSON value, because MongoDB uses JavaScript engine which doesn't distinguish between integer and decimal numbers.
+:two: `$type` is an operator in MongoDB to query documents by BSON type. 
+
+Illustration
+~~~ps1
+mongosh
+
+var obj = {a: "", b: {}, c: [], d: true};
+print(obj);
+#Output: { a: '', b: {}, c: [], d: true }
+
+typeof obj.a;
+typeof obj.b;
+typeof obj.c;
+obj.c instanceof Array;
+typeof obj.d;
+
+<# Output
+string
+object
+object
+true
+boolean
+test>
+#>
+~~~
 
                 
   
