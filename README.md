@@ -593,22 +593,6 @@ db.version()
 # 6.0.6
 ~~~
 
-#### Common CRUD and Administrartion Functions in the db Object
-
-|Create|Read|Update|Delete|
-|---|---|---|---|
-|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
-|db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|db.createCollection(), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
-|db.createView()||||
-||||db.dropDatabase()|
-
-|Grant|Revoke|Manage|
-|---|---|---|
-|db.grantRolesToRole()|db.revokeRolesFromRole()|db.version(), db.getMongo(), db.serverBuildInfo()|
-|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
-|db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
-
 
 ## MongoDB BSON Data Types
 
@@ -688,7 +672,70 @@ ISODate()
 Date()
 #Output: Tue Jan 16 2024 17:17:50 GMT+0100 (Central European Standard Time)
 ~~~
-                
+
+## Explore Databases and Collections
+
+| Command | Description |
+|---|---|
+| db | Show the active Database |
+| show dbs | Show all Databases |
+| use DatabaseName | Change the active database |
+| show collections | Show all Collections inside the active database |
+
+:memo: Memo:
+- :one: There is no command to create new Database. Database will be created together with first collection.
+- :two: The command `db.dropDatabase()` drops the active database.
+- :three: As soon as you drop the last collection of an active database, the active database will be dropped as well automatically.
+
+|Create|Read|Update|Delete|
+|---|---|---|---|
+|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
+|db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
+|db.createCollection("CollectionName"), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||db.getCollection("CollectionName").drop()|
+|db.createView()||||
+||||db.dropDatabase()|
+
+|Grant|Revoke|Manage|
+|---|---|---|
+|db.grantRolesToRole()|db.revokeRolesFromRole()|db.version(), db.getMongo(), db.serverBuildInfo()|
+|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
+|db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
+
+Create a collection in the acive database
+~~~ps1
+mongosh mongodb://root:root@localhost:27017
+
+use MockDatabase
+MockDatabase> db.createCollection("MockUsers")
+MockDatabase> show collections
+# MockUsers
+~~~
+
+Practice
+~~~ps1
+//Connect to mongodb shell
+mongosh mongodb://root:root@localhost:27017
+
+// Create a db called demoDB
+db
+show dbs
+use demoDB
+db
+show dbs
+
+// Create 2 collections myCollection1 and myCollection2
+db.createCollection("myCollection1")
+db.createCollection("myCollection2")
+show collections
+show dbs
+
+// Delete both collections. Delete also demoDB
+db.getCollection("myCollection1").drop()
+db.getCollection("myCollection2").drop()
+show collections
+db
+show dbs
+~~~  
   
      
 
