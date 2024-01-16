@@ -625,8 +625,8 @@ db.version()
 |18|64-bit Integer|NumberLong()|"long"|
 
 :memo: Memo:
-:one:If type of Number is not specified, it will be stored as Double BSON value, because MongoDB uses JavaScript engine which doesn't distinguish between integer and decimal numbers.
-:two: `$type` is an operator in MongoDB to query documents by BSON type. 
+- :one:If type of Number is not specified, it will be stored as Double BSON value, because MongoDB uses JavaScript engine which doesn't distinguish between integer and decimal numbers.
+- :two: `$type` is an operator in MongoDB to query documents by BSON type. 
 
 Illustration
 ~~~ps1
