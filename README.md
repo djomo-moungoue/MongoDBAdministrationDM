@@ -379,7 +379,7 @@ test>
 ~~~
 
 Retrieve all establishe MongoDB connections
-~~ps1
+~~~ps1
 Get-NetTCPConnection -State Established | Where-Object {$_.LocalPort -eq 27017}
 
 <# Output example
@@ -392,13 +392,13 @@ LocalAddress                        LocalPort RemoteAddress                     
 ~~~
 
 Get all TCP connections that use a TCP applied setting of Internet.
-~~~sh
+~~~ps1
 Get-NetTCPConnection -AppliedSetting Internet
 ~~~
 
-Make a MongoDB server accepts connections from any IP address
+Make a MongoDB server accepts connections from `any IP address`
 
-~~~ps1 (Administrator)
+~~~ps1
 # Run PowerShell with highest priviledges
 # Open the configuration file
 notepad.exe $env:ProgramFiles\MongoDB\Server\6.0\bin\mongod.cfg
@@ -421,8 +421,14 @@ Get-Service -Name "MongoDB" | Restart-Service
 ~~~
 
 Connect to a MongoDB server located on a remote computer in the same network
-~~~
-mongosh IPAddressRemoteComputer
+~~~ps1
+<#
+Username: unser name in the remote database
+Username: unser pasword in the remote database
+IPAddressRemoteComputer: IP address of the remote computer
+DatabaseName: MongoDB database on the remote computer
+#>
+mongosh mongodb://Username:Password@IPAddressRemoteComputer:27017/DatabaseName
 ~~~
 
 ## Data Persistence

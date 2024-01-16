@@ -66,7 +66,7 @@ show users
 # :two: Enable Authorization on MongoDB server
 
 After creating the root user, you have to enable authorization on the MongoDB server by editing the configuration file in an editor.
-~~~ps1 (Administrator)
+~~~ps1
 # Run PowerShell with highest priviledges
 # Open the configuration file
 notepad.exe $env:ProgramFiles\MongoDB\Server\6.0\bin\mongod.cfg
@@ -80,7 +80,7 @@ security:
 ~~~
 
 Restart the MongoDB service
-~~~ps1 (Administrator)
+~~~ps1
 # Run PowerShell with highest priviledges
 Get-Service -Name "MongoDB" | Restart-Service
 ~~~
