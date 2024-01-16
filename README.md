@@ -99,13 +99,20 @@ Databases(
 ~~~
 
 MongoDB has the following architecture: 
-- `mongod`: is the service used to launch the MongoDB server.
-- `mongo shell`: is the MongoDB command line bundled to MongoDB server. It is launched by using the `mongo` command. 
-- `mongodump`: is used to backup the data of a MongoDB server in a dump file.
-- `mongorestore`: is used to restore the data from a dump file into a MongoDB server.
-- `mongostat`: is used to monitor in real time the MongoDB performance.
-- `mongoexport`:  is used to export a subset of the database.
-- `mongoimport`: is used to import a subset of data to a MongoDB database. 
+:one: `mongod`: is the service used to launch the MongoDB server.
+
+:two: `mongosh`: is the MongoDB command line bundled to MongoDB server. It is launched by using the `mongo` command. 
+
+:three: `mongoimport`: is used to import a subset of data to a MongoDB database. 
+Further reading [here](https://www.mongodb.com/developer/products/mongodb/mongoimport-guide/)
+
+:four: `mongoexport`:  is used to export a subset of the database.
+
+:five: `mongodump`: is used to backup the data of a MongoDB server in a dump file.
+
+:six: `mongorestore`: is used to restore the data from a dump file into a MongoDB server.
+
+:seven: `mongostat`: is used to monitor in real time the MongoDB performance.
 
 Different tools to interact with MongoDB Server are:
 -  `mongo shell`: is a command line client that allows you to connect and interact manually with a local MongoDB server. 
@@ -137,11 +144,11 @@ By using Cloud Databases as a service:
 
 ### Install MongoDB on Windows using the PowerShell command line:
 
-Retrieve all available Mongodb packages
+#### :zero: Retrieve all available Mongodb packages
 ~~~ps1
 winget search --name mongodb
 
-<# EXAMPLE OUTPUT
+<# Output example
 Name                            Id                         Version  Source
 --------------------------------------------------------------------------
 MongoDB                          MongoDB.Server            6.0.6    winget
@@ -157,7 +164,7 @@ MongoDB Compass Community        MongoDB.Compass.Community 1.41.0   winget
 #>
 ~~~
 
-Install MongoDB server
+#### :one: Install MongoDB server on your local computer
 ~~~ps1
 <# 
 Installs the selected package, either found by searching a configured source or directly from a manifest. By default, the query must case-insensitively match the id, name, or moniker of the package.
@@ -168,7 +175,7 @@ Installs the selected package, either found by searching a configured source or 
 #>
 winget install --id MongoDB.Server --exact --source winget --silent
 
-<#EXAMPLE OUTPUT
+<# Output example
 Found MongoDB [MongoDB.Server] Version 6.0.6
 This application is licensed to you by its owner.
 Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
@@ -180,10 +187,49 @@ Successfully installed
 #>
 ~~~
 
-Install MongoDB Compass Community
+:heavy_plus_sign: Append the path of MongoDB executable to the user environment variable
+> C:\Program Files\MongoDB\Server\6.0\bin
+
+#### :two: Install MongoDB Shell on your local computer
+~~~ps1
+winget install --id MongoDB.Shell --exact --source winget --silent
+<# Output example
+Found MongoDB Shell [MongoDB.Shell] Version 1.10.1
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://downloads.mongodb.com/compass/mongosh-1.10.1-x64.msi
+  ██████████████████████████████  35.4 MB / 35.4 MB
+Successfully verified installer hash
+Starting package install...
+Successfully installed
+#>
+~~~
+
+Restart PowerShell and launch the mongosh console:
+~~~ps1
+mongosh
+
+<# Output example
+Current Mongosh Log ID: 65a6593fc593e766a03346f8
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1
+Using MongoDB:          6.0.6
+Using Mongosh:          1.10.1
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+
+To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
+You can opt-out by running the disableTelemetry() command.
+test>
+#>
+
+~~~
+
+#### :three: Install MongoDB Compass Community on your local computer
 ~~~ps1
 winget install --id MongoDB.Compass.Community --exact --source winget --silent
-<# EXAMPLE OUTPUT
+
+<# Output example
 Found MongoDB Compass Community [MongoDB.Compass.Community] Version 1.41.0
 This application is licensed to you by its owner.
 Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
@@ -194,17 +240,6 @@ Starting package install...
 Successfully installed
 #>
 ~~~
-
-~~~ps1
-# Create the MongoDB source directory in the C drive C:\data\db
-New-Item -ItemType Directory "\data\db"
-
-# Create the MongoDB source directory in the  git directory
-New-Item -ItemType Directory "$env:USERPROFILE\ProjectsDM\MongoDBAdministrationDM\data\db"
-~~~
-
-:heavy_plus_sign: Append the path of MongoDB executable to the user environment variable
-> C:\Program Files\MongoDB\Server\6.0\bin
 
 :heavy_plus_sign: Append the path of MongoDB executable to the user environment variable
 > C:\Program Files\MongoDB Compass
@@ -307,13 +342,22 @@ local   72.00 KiB
 #>
 ~~~
 
+#### :four: Create the data directory
+~~~ps1
+# Create the MongoDB source directory in the C drive C:\data\db
+New-Item -ItemType Directory "\data\db"
+
+# In my case I have rather created the MongoDB source directory in the  git directory
+New-Item -ItemType Directory "$env:USERPROFILE\ProjectsDM\MongoDBAdministrationDM\DataPersistence\db"
+~~~
+
 MongoDB Server Hosting Services Overview
 - [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
 - [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
 - [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
 - [Amazon EC2](https://aws.amazon.com/de/pm/ec2/)
 
-
+#### :five: Local and Remote Connection
 Connect to a MongoDB server located on a local computer
 ~~~ps1
 mongo 127.0.01
@@ -356,7 +400,11 @@ mongo IPAddressRemoteComputer
 
 ## Data Persistence
 
-.\DataPersitence\DatabaseArchitecture.md
+Database Architecture
+> .\DataPersitence\DatabaseArchitecture.md
+
+Manage Users
+> .\DataPersitence\db\ManageMockUsers.md
 
 
 
