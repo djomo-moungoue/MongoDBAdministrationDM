@@ -53,11 +53,11 @@ Example:
 - (7) ObjectId
 - (8) and others.
 
-N.B.: `MongoDB` stores documents in `BSON format`. 
+:memo: `MongoDB` stores documents in `BSON format`. 
 
 The `extended JSON` is used to convert JSON to BSON and vice versa. It has a `shell mode` and a `strict mode` of operation:
 
-The `Shell Mode`:
+:memo: The `Shell Mode`:
 - uses inline `BSON` types
 - is the internal MongoDB mode
 - is compatible with MongoDB shell
@@ -70,7 +70,7 @@ The `Shell Mode`:
     }
     ~~~
 
-The `Strict Mode`:
+:memo: The `Strict Mode`:
  - represents BSON types using special key names prepended with $
  - is compatible with the `JSON` standard
  - is used in all JSON parsers
@@ -142,7 +142,7 @@ By using Cloud Databases as a service:
 - :green_circle: It is easy to manage and to scale
 - :red_circle:  It offers free size-limited options available
 
-### Install MongoDB on Windows using the PowerShell command line:
+### Install MongoDB on Windows Local Computer using the PowerShell command line:
 
 #### :zero: Retrieve all available Mongodb packages
 ~~~ps1
@@ -267,6 +267,7 @@ MongoDBCompass.exe --help
 Launch MongoDB Compass in PowerShell
 ~~~ps1
 # Open a connexion on mongodb://127.0.01:27017 without blocking the terminal
+# if the root user is not yet set
 MongoDBCompass.exe mongodb://localhost:27017 &
 <# Output example
 Id     Name            PSJobTypeName   State         HasMoreData     Location             Command
@@ -275,72 +276,14 @@ Id     Name            PSJobTypeName   State         HasMoreData     Location   
 #>
 ~~~
 
-
-Show available commands
-~~~mongosh
-help
-
-<#
-`use` : Set current database
-
-`show` :
-- 'show databases'/'show dbs': Print a list of all available databases.
-- 'show collections'/'show tables': Print a list of all collections for current database.
-- 'show profile': Prints system.profile information.
-- 'show users': Print a list of all users for current database.
-- 'show roles': Print a list of all roles for current database. 
-- 'show log <type>': log for current connection, if type is not set uses 'global' 'show logs': Print all logs.
-
-`exit`	Quit the MongoDB shell with exit/exit()/.exit
-
-`quit`	Quit the MongoDB shell with quit/quit()
-
-`Mongo`	Create a new connection and return the Mongo object. Usage: new Mongo(URI, options [optional])
-
-`connect`	Create a new connection and return the Database object. Usage: connect(URI, username [optional], password [optional])
-it	result of the last line evaluated; use to further iterate
-
-`version`	Shell version
-
-`load`	Loads and runs a JavaScript file into the current shell environment
-
-`enableTelemetry`	Enables collection of anonymous usage data to improve the mongosh CLI
-
-`disableTelemetry`	Disables collection of anonymous usage data to improve the mongosh CLI
-
-`passwordPrompt`	Prompts the user for a password
-
-`sleep`	Sleep for the specified number of milliseconds
-
-`print`	Prints the contents of an object to the output
-
-`printjson`	Alias for print()
-
-`convertShardKeyToHashed`	Returns the hashed value for the input using the same hashing function as a hashed index.
-
-`cls`	Clears the screen like console.clear()
-
-`isInteractive`	Returns whether the shell will enter or has entered interactive mode
-#>
+~~~ps1
+# Open a connexion on mongodb://127.0.01:27017 without blocking the terminal
+# if the root user is not set
+MongoDBCompass.exe mongodb://root:root@localhost:27017 &
 ~~~
 
-Show the MongoDB Server version
-~~~mongosh
-db.version()
-<# Output example
-6.0.6
-#>
-~~~
 
-Print a list of all available databases
-~~~mongosh
-show databases //alias dbs
-<# Output example
-admin   40.00 KiB
-config  72.00 KiB
-local   72.00 KiB
-#>
-~~~
+
 
 #### :four: Create the data directory
 ~~~ps1
@@ -350,15 +293,6 @@ New-Item -ItemType Directory "\data\db"
 # In my case I have rather created the MongoDB source directory in the  git directory
 New-Item -ItemType Directory "$env:USERPROFILE\ProjectsDM\MongoDBAdministrationDM\DataPersistence\db"
 ~~~
-
-### MongoDB Server Hosting Services Overview
-:one: [Amazon EC2](https://aws.amazon.com/de/pm/ec2/)
-
-:two: [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
-
-:three: [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
-
-:four: [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
 
 ### Establish Local and Remote Connections
 
@@ -426,12 +360,12 @@ Connect to a MongoDB server located on a remote computer in the same network
 Username: unser name in the remote database
 Username: unser pasword in the remote database
 IPAddressRemoteComputer: IP address of the remote computer
-DatabaseName: MongoDB database on the remote computer
+DatabaseName: MongoDB authentiction database on the remote computer
 #>
 mongosh mongodb://Username:Password@IPAddressRemoteComputer:27017/DatabaseName
 ~~~
 
-## Data Persistence
+#### Data Persistence
 
 Database Architecture
 > .\DataPersitence\DatabaseArchitecture.md
@@ -439,11 +373,328 @@ Database Architecture
 Manage Users
 > .\DataPersitence\db\ManageMockUsers.md
 
+### Host MongoDB Server by a Cloud Service Provider
+
+:one: [Amazon EC2 VPS MongoDB](https://aws.amazon.com/de/pm/ec2/)
+
+~~~ps1
+# Connection example to the admin database
+mongo "mongodb://root:root@ec2-34-216-244-19.us-west-2.compute.amazonaws.com/admin"
+~~~
+
+:two: [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
+
+:three: [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
+
+:four: [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
+
+#### Section 6: Using MongoDB as a Service (Cloud MongoDB)
+
+:one: Introduction to MongoDB Cloud
+
+:two: Create MongoD Atlas Cluster
+
+:three: Verify connection to the Cloud MongoDB Replica Set
+
+~~~ps1
+# Connection example to the admin database
+mongo "mongodb://cluster0-shard-00-00-fdpbt.mongodb.net:27017,cluster0-shard-00-01-fdpbt.mongodb.net:27017,cluster-00-02-fdpbt.net:27017/?replicatSet=Cluster0-shard-0" --ssl --authenticationDatabase admin -username root --password root
+~~~
+
+## Explore Mongo DB Shell and Server
+
+### MongoDB Server
+
+MongoDB Server:
+- :one: Windows Service is named `MongoDB`
+- :two: daemon is named `Mongod`
+
+MongoDB Server Version
+~~~ps1
+mongod --version
+<# Output example
+db version v6.0.6
+Build Info: {
+    "version": "6.0.6",
+    "gitVersion": "26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7",
+    "modules": [],
+    "allocator": "tcmalloc",
+    "environment": {
+        "distmod": "windows",
+        "distarch": "x86_64",
+        "target_arch": "x86_64"
+    }
+}
+#>
+~~~
+
+Or
+
+~~~ps1
+mongosh
+
+db.version()
+# 6.0.6
+~~~
+
+Verify which JavaScript engine is used in you MongoDB Server
+~~~ps1
+mongosh
+
+db.serverBuildInfo()
+
+<# Output example
+{
+  version: '6.0.6',
+  gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7',
+  targetMinOS: 'Windows 7/Windows Server 2008 R2',
+  modules: [],
+  allocator: 'tcmalloc',
+  javascriptEngine: 'mozjs', //modernized JavaScript
+  sysInfo: 'deprecated',
+  versionArray: [ 6, 0, 6, 0 ],
+  openssl: { running: 'Windows SChannel' },
+  buildEnvironment: {
+    distmod: 'windows',
+    distarch: 'x86_64',
+    cc: 'cl: Microsoft (R) C/C++ Optimizing Compiler Version 19.31.31107 for x64',
+    ccflags: '/nologo /WX /FImongo/platform/basic.h /fp:strict /EHsc /W3 /wd4068 /wd4244 /wd4267 /wd4290 /wd4351 /wd4355 /wd4373 
+/wd4800 /wd4251 /wd4291 /we4013 /we4099 /we4930 /errorReport:none /MD /O2 /Oy- /bigobj /utf-8 /permissive- /Zc:__cplusplus /Zc:sizedDealloc /volatile:iso /diagnostics:caret /std:c++17 /Gw /Gy /Zc:inline',
+    cxx: 'cl: Microsoft (R) C/C++ Optimizing Compiler Version 19.31.31107 for x64',
+    cxxflags: '/TP',
+    linkflags: '/nologo /DEBUG /INCREMENTAL:NO /LARGEADDRESSAWARE /OPT:REF',
+    target_arch: 'x86_64',
+    target_os: 'windows',
+    cppdefines: 'SAFEINT_USE_INTRINSICS 0 PCRE_STATIC NDEBUG BOOST_ALL_NO_LIB _UNICODE UNICODE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS _CONSOLE _CRT_SECURE_NO_WARNINGS _ENABLE_EXTENDED_ALIGNED_STORAGE _SCL_SECURE_NO_WARNINGS _WIN32_WINNT 0x0A00 BOOST_USE_WINAPI_VERSION 0x0A00 NTDDI_VERSION 0x0A000000 BOOST_THREAD_VERSION 5 BOOST_THREAD_USES_DATETIME BOOST_SYSTEM_NO_DEPRECATED BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS BOOST_ENABLE_ASSERT_DEBUG_HANDLER BOOST_LOG_NO_SHORTHAND_NAMES BOOST_LOG_USE_NATIVE_SYSLOG BOOST_LOG_WITHOUT_THREAD_ATTR ABSL_FORCE_ALIGNED_ACCESS'
+  },
+  bits: 64,
+  debug: false,
+  maxBsonObjectSize: 16777216,
+  storageEngines: [ 'devnull', 'ephemeralForTest', 'wiredTiger' ],
+  ok: 1
+}
+#>
+~~~
+
+### MongoDB Shell
+
+MongoDB Shell:
+- :one: is based on JavaScript
+- :two: uses SpiderMonkey JavaScript engine starting from v3.2
+- :three: supports ECMAScript 6 (ES6) starting from v3.2
+- :four: supports mongo shell and server-side JavaScript
+- :five: uses `mongosh` in Windows OS and `mongo` in Linux and Mac OS to start his console
+
+MongoDB Shell Version
+~~~ps1
+mongosh --version
+# 1.10.1
+~~~
+
+Or
+
+~~~ps1
+mongosh
+
+version()
+# 1.10.1
+~~~
+
+Show available commands
+~~~mongosh
+help
+
+<#
+`use` : Set current database
+
+`show` :
+- 'show databases'/'show dbs': Print a list of all available databases.
+- 'show collections'/'show tables': Print a list of all collections for current database.
+- 'show profile': Prints system.profile information.
+- 'show users': Print a list of all users for current database.
+- 'show roles': Print a list of all roles for current database. 
+- 'show log <type>': log for current connection, if type is not set uses 'global' 'show logs': Print all logs.
+
+`exit`	Quit the MongoDB shell with exit/exit()/.exit
+
+`quit`	Quit the MongoDB shell with quit/quit()
+
+`Mongo`	Create a new connection and return the Mongo object. Usage: new Mongo(URI, options [optional])
+
+`connect`	Create a new connection and return the Database object. Usage: connect(URI, username [optional], password [optional])
+it	result of the last line evaluated; use to further iterate
+
+`version`	Shell version
+
+`load`	Loads and runs a JavaScript file into the current shell environment
+
+`enableTelemetry`	Enables collection of anonymous usage data to improve the mongosh CLI
+
+`disableTelemetry`	Disables collection of anonymous usage data to improve the mongosh CLI
+
+`passwordPrompt`	Prompts the user for a password
+
+`sleep`	Sleep for the specified number of milliseconds
+
+`print`	Prints the contents of an object to the output
+
+`printjson`	Alias for print()
+
+`convertShardKeyToHashed`	Returns the hashed value for the input using the same hashing function as a hashed index.
+
+`cls`	Clears the screen like console.clear()
+
+`isInteractive`	Returns whether the shell will enter or has entered interactive mode
+#>
+~~~
+
+~~~ps1
+mongosh
+
+typeof db
+# Output: object
+~~~
+
+Show all methods of the db object
+~~~ps1
+mongosh
+
+db. # press tab twice to show all methods of the db object
+db.c # press tab twice to show all commands having the prefix c
+~~~
+
+Show a function declaration
+~~~ps1
+mongosh
+
+db.version
+<# Output example
+[Function: version] AsyncFunction {
+  apiVersions: [ 0, 0 ],
+  returnsPromise: true,
+  serverVersions: [ '0.0.0', '999.999.999' ],
+  topologies: [ 'ReplSet', 'Sharded', 'LoadBalanced', 'Standalone' ],
+  returnType: { type: 'unknown', attributes: {} },
+  deprecated: false,
+  platforms: [ 'Compass', 'Browser', 'CLI' ],
+  isDirectShellCommand: false,
+  acceptsRawInput: false,
+  shellCommandCompleter: undefined,
+  help: [Function (anonymous)] Help
+}
+#>
+~~~
+
+Call a function
+~~~ps1
+mongosh
+
+db.version()
+# 6.0.6
+~~~
+
+#### Common CRUD and Administrartion Functions in the db Object
+
+|Create|Read|Update|Delete|
+|---|---|---|---|
+|db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
+|db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
+|db.createCollection(), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()|||
+|db.createView()||||
+||||db.dropDatabase()|
+
+|Grant|Revoke|Manage|
+|---|---|---|
+|db.grantRolesToRole()|db.revokeRolesFromRole()|db.version(), db.getMongo(), db.serverBuildInfo()|
+|db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
+|db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
 
+## MongoDB BSON Data Types
 
+|Number ID|Type|Syntax|String ID|
+|---|---|---|---|
+|1|Double|0.0|"dbouble"|
+|2|String|""|"string"|
+|3|Object|{}|"object"|
+|4|Array|[]|""|
+|7|ObjectId|ObjectId()|"objectId"|
+|8|Boolean|true/false|"boolean"|
+|9|Date|ISODate()|"date"|
+|16|32-bit Integer|NumberInt()|"int"|
+|18|64-bit Integer|NumberLong()|"long"|
 
+:memo: Memo:
+- :one:If type of Number is not specified, it will be stored as Double BSON value, because MongoDB uses JavaScript engine which doesn't distinguish between integer and decimal numbers.
+- :two: `$type` is an operator in MongoDB to query documents by BSON type. 
+- :three: `_id`:
+    - makes each document unique across the database. 
+    - is a mandatory document field
+    - can be assigned manually
+    - will be created automatically if not assigned manually (recommended)
+- :four: `ObjectId("65a6a8da4bd4f647147298dd")`:
+    - is a special BSON type used to assigne unique value to the `_id field` of a document.
+    - is 12 Bytes long divided in 4 parts:
+        - :one: 4 Bytes representing the document creation date in seconds since Unix epoch "65 a6 a8 da"
+        - :two: 3 Bytes representing the machine ID (MD5 hash of the hostname and MAC address) "4b d4 f6"
+        - :two: 2 Bytes representing the process ID "47 14"
+        - :two: 3 Bytes representing a counter (starts from random number) incremented for each new document inserted "72 98 dd"
+- :five: Dates in MongoDB server:
+    - are stored in ISO format
+    - new Date() and ISODate() generates the current timestamp in ISO format.
+    - Be carefull when converting date, because the month number start with 0 (January) for example. The output date could converted to the corresponding time zone date, or to UTC datetime.
 
+Illustration
+~~~ps1
+mongosh
 
+var obj = {a: "", b: {}, c: [], d: true};
+print(obj);
+#Output: { a: '', b: {}, c: [], d: true }
 
+typeof obj.a;
+typeof obj.b;
+typeof obj.c;
+obj.c instanceof Array;
+typeof obj.d;
 
+<# Output
+string
+object
+object
+true
+boolean
+test>
+#>
+~~~
+
+Generate an objecid
+~~~ps1
+mongosh
+
+ObjectId()
+# Output: ObjectId("65a6a8da4bd4f647147298dd")
+~~~
+
+~~~ps1
+mongosh
+
+new Date()
+#Output: ISODate("2024-01-16T16:12:52.384Z")
+
+ISODate()
+#Output: ISODate("2024-01-16T16:12:59.916Z")
+
+Date()
+#Output: Tue Jan 16 2024 17:17:50 GMT+0100 (Central European Standard Time)
+~~~
+                
+  
+     
+
+            
+
+  
+                               
+          
+                                   
