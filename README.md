@@ -351,51 +351,84 @@ New-Item -ItemType Directory "\data\db"
 New-Item -ItemType Directory "$env:USERPROFILE\ProjectsDM\MongoDBAdministrationDM\DataPersistence\db"
 ~~~
 
-MongoDB Server Hosting Services Overview
-- [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
-- [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
-- [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
-- [Amazon EC2](https://aws.amazon.com/de/pm/ec2/)
+### MongoDB Server Hosting Services Overview
+:one: [Amazon EC2](https://aws.amazon.com/de/pm/ec2/)
 
-#### :five: Local and Remote Connection
+:two: [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
+
+:three: [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
+
+:four: [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
+
+### Establish Local and Remote Connections
+
 Connect to a MongoDB server located on a local computer
 ~~~ps1
-mongo 127.0.01
+mongosh 127.0.0.1
+
+<# Output example
+Current Mongosh Log ID: 65a664a5a78f6c13fe515109
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1
+Using MongoDB:          6.0.6
+Using Mongosh:          1.10.1
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+test>
+#>
 ~~~
 
-Retrieve all mongoDB connections
-~~ps1
-Get-NetTCPConnection | Where-Object {$_.LocalPort -eq 27017}
-~~~
-
-Retrieve all IP-addresses MongoDB ist listening to
-~~~sh
-# Get-NetTCPConnection | Select-String mongod # Doesn't work
-netstats -plant | grep mongod # Works
-~~~
-
-Make a MongoDB server accepts connections from any IP address
-~~~sh
-# Open mongod.conf and replace
-network interfaces
-net: 
-port: 27017
-bindIp: 127.0.0.1 
-# with
-network interfaces
-net:
-port: 27017
-bindIp: 0.0.0.0
-~~~
-
-Restart the mongo db service
+Retrieve all establishe MongoDB connections
 ~~~ps1
-Restart-Service -Name mongod
+Get-NetTCPConnection -State Established | Where-Object {$_.LocalPort -eq 27017}
+
+<# Output example
+LocalAddress                        LocalPort RemoteAddress                       RemotePort State       AppliedSetting OwningPr
+                                                                                                                        ocess    
+------------                        --------- -------------                       ---------- -----       -------------- -------- 
+127.0.0.1                           27017     127.0.0.1                           60217      Established Internet       14056    
+127.0.0.1                           27017     127.0.0.1                           60129      Established Internet       14056
+#>
+~~~
+
+Get all TCP connections that use a TCP applied setting of Internet.
+~~~ps1
+Get-NetTCPConnection -AppliedSetting Internet
+~~~
+
+Make a MongoDB server accepts connections from `any IP address`
+
+~~~ps1
+# Run PowerShell with highest priviledges
+# Open the configuration file
+notepad.exe $env:ProgramFiles\MongoDB\Server\6.0\bin\mongod.cfg
+# code $env:ProgramFiles\MongoDB\Server\6.0\bin\mongod.cfg # In VS code terminal only
+~~~
+
+Add this lines in the network interfaces section:
+~~~ps1
+# network interfaces
+net:
+  port: 27017
+  #bindIp: 127.0.0.1
+  bindIp: 0.0.0.0
+~~~
+
+Restart the MongoDB service
+~~~ps1 (Administrator)
+# Run PowerShell with highest priviledges
+Get-Service -Name "MongoDB" | Restart-Service
 ~~~
 
 Connect to a MongoDB server located on a remote computer in the same network
-~~~
-mongo IPAddressRemoteComputer
+~~~ps1
+<#
+Username: unser name in the remote database
+Username: unser pasword in the remote database
+IPAddressRemoteComputer: IP address of the remote computer
+DatabaseName: MongoDB database on the remote computer
+#>
+mongosh mongodb://Username:Password@IPAddressRemoteComputer:27017/DatabaseName
 ~~~
 
 ## Data Persistence
