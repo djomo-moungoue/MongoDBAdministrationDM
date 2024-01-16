@@ -142,7 +142,7 @@ By using Cloud Databases as a service:
 - :green_circle: It is easy to manage and to scale
 - :red_circle:  It offers free size-limited options available
 
-### Install MongoDB on Windows using the PowerShell command line:
+### Install MongoDB on Windows Local Computer using the PowerShell command line:
 
 #### :zero: Retrieve all available Mongodb packages
 ~~~ps1
@@ -267,12 +267,19 @@ MongoDBCompass.exe --help
 Launch MongoDB Compass in PowerShell
 ~~~ps1
 # Open a connexion on mongodb://127.0.01:27017 without blocking the terminal
+# if the root user is not yet set
 MongoDBCompass.exe mongodb://localhost:27017 &
 <# Output example
 Id     Name            PSJobTypeName   State         HasMoreData     Location             Command
 --     ----            -------------   -----         -----------     --------             -------
 1      Job1            BackgroundJob   Running       True            localhost            MongoDBCompass.exe mongo…
 #>
+~~~
+
+~~~ps1
+# Open a connexion on mongodb://127.0.01:27017 without blocking the terminal
+# if the root user is not set
+MongoDBCompass.exe mongodb://root:root@localhost:27017 &
 ~~~
 
 
@@ -351,15 +358,6 @@ New-Item -ItemType Directory "\data\db"
 New-Item -ItemType Directory "$env:USERPROFILE\ProjectsDM\MongoDBAdministrationDM\DataPersistence\db"
 ~~~
 
-### MongoDB Server Hosting Services Overview
-:one: [Amazon EC2](https://aws.amazon.com/de/pm/ec2/)
-
-:two: [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
-
-:three: [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
-
-:four: [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
-
 ### Establish Local and Remote Connections
 
 Connect to a MongoDB server located on a local computer
@@ -426,18 +424,46 @@ Connect to a MongoDB server located on a remote computer in the same network
 Username: unser name in the remote database
 Username: unser pasword in the remote database
 IPAddressRemoteComputer: IP address of the remote computer
-DatabaseName: MongoDB database on the remote computer
+DatabaseName: MongoDB authentiction database on the remote computer
 #>
 mongosh mongodb://Username:Password@IPAddressRemoteComputer:27017/DatabaseName
 ~~~
 
-## Data Persistence
+#### Data Persistence
 
 Database Architecture
 > .\DataPersitence\DatabaseArchitecture.md
 
 Manage Users
 > .\DataPersitence\db\ManageMockUsers.md
+
+### Host MongoDB Server by a Cloud Service Provider
+
+:one: [Amazon EC2 VPS MongoDB](https://aws.amazon.com/de/pm/ec2/)
+
+~~~ps1
+# Connection example to the admin database
+mongo "mongodb://root:root@ec2-34-216-244-19.us-west-2.compute.amazonaws.com/admin"
+~~~
+
+:two: [DigitalOcean Droplets](https://www.digitalocean.com/products/droplets)
+
+:three: [Hetzner Dedicated Servers and Virtual Private Servers (VPS)](https://www.hetzner.com/)
+
+:four: [GoDaddy Dedicated Servers and VPS](https://www.godaddy.com/en-uk/hosting/dedicated-server)
+
+#### Section 6: Using MongoDB as a Service (Cloud MongoDB)
+
+:one: Introduction to MongoDB Cloud
+
+:two: Create MongoD Atlas Cluster
+
+:three: Verify connection to the Cloud MongoDB Replica Set
+
+~~~ps1
+# Connection example to the admin database
+mongo "mongodb://cluster0-shard-00-00-fdpbt.mongodb.net:27017,cluster0-shard-00-01-fdpbt.mongodb.net:27017,cluster-00-02-fdpbt.net:27017/?replicatSet=Cluster0-shard-0" --ssl --authenticationDatabase admin -username root --password root
+~~~
 
 
 
