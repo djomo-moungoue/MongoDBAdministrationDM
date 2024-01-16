@@ -627,6 +627,22 @@ db.version()
 :memo: Memo:
 - :one:If type of Number is not specified, it will be stored as Double BSON value, because MongoDB uses JavaScript engine which doesn't distinguish between integer and decimal numbers.
 - :two: `$type` is an operator in MongoDB to query documents by BSON type. 
+- :three: `_id`:
+    - makes each document unique across the database. 
+    - is a mandatory document field
+    - can be assigned manually
+    - will be created automatically if not assigned manually (recommended)
+- :four: `ObjectId("65a6a8da4bd4f647147298dd")`:
+    - is a special BSON type used to assigne unique value to the `_id field` of a document.
+    - is 12 Bytes long divided in 4 parts:
+        - :one: 4 Bytes representing the document creation date in seconds since Unix epoch "65 a6 a8 da"
+        - :two: 3 Bytes representing the machine ID (MD5 hash of the hostname and MAC address) "4b d4 f6"
+        - :two: 2 Bytes representing the process ID "47 14"
+        - :two: 3 Bytes representing a counter (starts from random number) incremented for each new document inserted "72 98 dd"
+- :five: Dates in MongoDB server:
+    - are stored in ISO format
+    - new Date() and ISODate() generates the current timestamp in ISO format.
+    - Be carefull when converting date, because the month number start with 0 (January) for example. The output date could converted to the corresponding time zone date, or to UTC datetime.
 
 Illustration
 ~~~ps1
@@ -652,6 +668,26 @@ test>
 #>
 ~~~
 
+Generate an objecid
+~~~ps1
+mongosh
+
+ObjectId()
+# Output: ObjectId("65a6a8da4bd4f647147298dd")
+~~~
+
+~~~ps1
+mongosh
+
+new Date()
+#Output: ISODate("2024-01-16T16:12:52.384Z")
+
+ISODate()
+#Output: ISODate("2024-01-16T16:12:59.916Z")
+
+Date()
+#Output: Tue Jan 16 2024 17:17:50 GMT+0100 (Central European Standard Time)
+~~~
                 
   
      
