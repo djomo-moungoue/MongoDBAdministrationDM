@@ -14,25 +14,25 @@ A `document database`:
 - the supported data types are: String, Number, Boolean, Array, Object, Null
 
 Example:
-~~~json
+~~~ps1
 {
-    “String”: “That’s a sample string”;
-    “Number”: 3,
-    “Boolean”: true,
-    “Array”: [1, 2, 3],
-    “Object”: 
+    "String": "That’s a sample string",
+    "Number": 3,
+    "Boolean": true,
+    "Array": [1, 2, 3],
+    "Object": 
     {
-        “Key1”: 1,
-        “Key2”: “Tow”,
-        “Key3”: false,
-        “Key4”: [“first”, “second”],
-        “Key5”:
+        "Key1": 1,
+        "Key2": "Tow",
+        "Key3": false,
+        "Key4": ["first", "second"],
+        "Key5":
         {
-            “nestedobjectkey1”: “nested”,
-            “nestedobjectkey2”: false,
+            "nestedobjectkey1": "nested",
+            "nestedobjectkey2": false,
         }
     }
-    “Null”: null // meaning that the value is absent.
+    "Null": null # meaning that the value is absent.
 }
 ~~~
 
@@ -675,6 +675,11 @@ Date()
 
 ## Explore Databases and Collections
 
+In this section:
+- `cn` will stand for `CollectionName`
+- `o` will stand for `Object`
+- `aoo` will stand for `ArrayOfObjects`
+
 | Command | Description |
 |---|---|
 | db | Show the active Database |
@@ -691,7 +696,7 @@ Date()
 |---|---|---|---|
 |db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
 |db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|`db.createCollection("CollectionName")`, db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||`db.getCollection("CollectionName").drop()`|
+|`db.createCollection("cn")`, db.createEncryptedCollection()|`db.getCollection("cn")`, db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||`db.getCollection("cn").drop()`|
 |db.createView()||||
 ||||`db.dropDatabase()`|
 
@@ -701,7 +706,7 @@ Date()
 |db.grantRolesToUser()|db.revokeRolesFromUser()|db.setLogLevel(), db.rotateCertificates(), db.listCommands()|
 |db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
-Create a collection in the acive database
+Create a collection in the active database
 ~~~ps1
 mongosh mongodb://root:root@localhost:27017
 
@@ -742,10 +747,182 @@ show collections
 db
 show dbs
 ~~~  
-  
-     
 
-            
+### Collection Methods
+
+Create
+~~~ps1
+db.createCollection("cn")
+~~~
+
+Read
+~~~ps1
+db.getCollection("cn").find(<o> or <aoo>)
+db.getCollection("Collection1").findOne(<o>)
+~~~
+
+Update
+~~~ps1
+db.getCollection("cn").insertOne(<o>)
+db.getCollection("cn").findOneAndUpdate(<o>)
+b.getCollection("cn").findOneAndReplace(<o>)
+db.getCollection("cn").insertMany(<aoo>)
+~~~
+
+Delete
+~~~ps1
+db.getCollection("cn").deleteOne(<o>)
+db.getCollection("cn").findOneAndDelete(<o>)
+db.getCollection("cn").deleteMany(<aoo>)
+db.getCollection("cn").drop()
+~~~
+  
+### Collection Methods - Insert / Delete Documents
+
+Insert one or many documents
+~~~ps1
+db.getCollection("cn").insert(<o> or <aoo>)
+{
+    return WriteResult() or BulkWriteResult() Object # Information about how many documents were inserted
+}
+
+db.getCollection("cn").insertOne(<o>)
+{
+    return _id  # ID of the inserted Object
+}
+
+db.getCollection("cn").insertMany(<aoo>)
+{
+    return [_ids]  # Array IDs of inserted Objects
+}
+~~~
+
+Practice
+~~~ps1
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+db.createCollection("Collection1")
+db.createCollection("Collection2")
+show collections
+
+db.getCollection("Collection1").insert({})
+<# Output example
+DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId("65b10cd806997e845fb8dded") }
+}
+#>
+db.getCollection("Collection1").insertOne({})
+
+# Retrieve all documents contained in Collection1
+db.getCollection("Collection1").find({}) # or db.getCollection("Collection1").find()
+<# Output example
+[
+  { _id: ObjectId("65b10cd806997e845fb8dded") },
+  { _id: ObjectId("65b10d3206997e845fb8ddee") }
+]
+#>
+
+db.getCollection("Collection1").insertMany([{}, {}, {}])
+<#
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("65b1158c06997e845fb8ddf0"),
+    '1': ObjectId("65b1158c06997e845fb8ddf1"),
+    '2': ObjectId("65b1158c06997e845fb8ddf2")
+  }
+}
+#>
+
+# Retrieve all documents contained in Collection1
+db.getCollection("Collection1").remove({}) # db.getCollection("Collection1").remove()
+<#
+DeprecationWarning: Collection.remove() is deprecated. Use deleteOne, deleteMany, findOneAndDelete, or bulkWrite.
+{ acknowledged: true, deletedCount: 6 }
+#>
+
+db.getCollection("Collection1").insertOne
+(
+    {
+        "string": "Thats a sample string"
+        ,"boolean": true
+    }
+)
+
+db.getCollection("Collection1").insertOne
+(
+    {
+        "String": "That’s a sample string",
+        "Boolean": true,
+        "Number": 10,
+        "NumberInt": NumberInt(100),
+        "NumberLong": NumberLong(18347035035835),
+        "Date": new Date(),
+        "ISODate": ISODate(),
+        "Array": [1, 2, 3],
+        "Object": 
+        {
+            "Key1": 1,
+            "Key3": false
+        }
+    }
+)
+
+db.getCollection("Collection1").findOne({})
+db.getCollection("Collection1").findOne({"Boolean": true})
+~~~
+ 
+:memo: Memo
+- A comma as record prefix works in MongoDB Compass mongosh BUT it fails in PowerShell mongosh (Shell Mode)
+- A comma as record suffix works in MongoDB Compass mongosh AND in PowerShell mongosh (Stric Mode)
+- A document id must be unique accross all documents in the same collection.
+
+Warning: NumberLong: specifying a number as argument is deprecated and may lead to loss of precision, pass a string instead.
+
+Challenge
+~~~ps1
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+db.getCollection("Collection2").insertOne
+(
+    {
+        "name": "Mike",
+        "sports": 
+        [
+            "Tennis",
+            "Football",
+            "Bowling"
+        ],
+        "medalQuantity": NumberInt(35),
+        "info": 
+        {
+            "champion": true,
+            "team":
+            {
+                "title": "Black Hawks",
+                "stats":
+                {
+                    "winsToLooseRate": 0.65,
+                    "wins": NumberInt(135)
+                }
+            }
+        },
+        "documentUpdatedAt": ISODate()
+    }
+);
+
+db.getCollection("Collection2").findOne({})
+~~~
+
+
+
+  
 
   
                                
