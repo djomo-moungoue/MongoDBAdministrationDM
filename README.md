@@ -691,9 +691,9 @@ Date()
 |---|---|---|---|
 |db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
 |db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|db.createCollection("CollectionName"), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||db.getCollection("CollectionName").drop()|
+|:heavy_check_mark: db.createCollection("CollectionName"), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||:heavy_check_mark: db.getCollection("CollectionName").drop()|
 |db.createView()||||
-||||db.dropDatabase()|
+||||:heavy_check_mark: db.dropDatabase()|
 
 |Grant|Revoke|Manage|
 |---|---|---|
@@ -732,6 +732,12 @@ show dbs
 // Delete both collections. Delete also demoDB
 db.getCollection("myCollection1").drop()
 db.getCollection("myCollection2").drop()
+show collections
+db
+show dbs
+
+// Delete both collections. Delete also demoDB: This command drop all collections of the active database
+db.dropDatabase()
 show collections
 db
 show dbs
