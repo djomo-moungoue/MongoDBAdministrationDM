@@ -691,9 +691,9 @@ Date()
 |---|---|---|---|
 |db.createUser()|db.getUsers(), db.getUser()|db.updateUser(), db.changeUserPassword()|db.dropAllUsers(), db.dropUser()|
 |db.createRole()|db.getRoles(), db.getRole()|db.updateRole()|db.dropAllRoles(), db.dropAllRole()|
-|:heavy_check_mark: db.createCollection("CollectionName"), db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||:heavy_check_mark: db.getCollection("CollectionName").drop()|
+|`db.createCollection("CollectionName")`, db.createEncryptedCollection()|db.getCollection(), db.getCollectionInfos(), db.getCollectionNames(), db.printCollectionStats()||`db.getCollection("CollectionName").drop()`|
 |db.createView()||||
-||||:heavy_check_mark: db.dropDatabase()|
+||||`db.dropDatabase()`|
 
 |Grant|Revoke|Manage|
 |---|---|---|
