@@ -430,7 +430,7 @@ Build Info: {
 
 Or
 
-~~~ps1
+~~~js
 mongosh
 
 db.version()
@@ -438,7 +438,7 @@ db.version()
 ~~~
 
 Verify which JavaScript engine is used in you MongoDB Server
-~~~ps1
+~~~js
 mongosh
 
 db.serverBuildInfo()
@@ -486,14 +486,14 @@ MongoDB Shell:
 - :five: uses `mongosh` in Windows OS and `mongo` in Linux and Mac OS to start his console
 
 MongoDB Shell Version
-~~~ps1
+~~~js
 mongosh --version
 # 1.10.1
 ~~~
 
 Or
 
-~~~ps1
+~~~js
 mongosh
 
 version()
@@ -501,7 +501,7 @@ version()
 ~~~
 
 Show available commands
-~~~mongosh
+~~~js
 help
 
 <#
@@ -548,7 +548,7 @@ it	result of the last line evaluated; use to further iterate
 #>
 ~~~
 
-~~~ps1
+~~~js
 mongosh
 
 typeof db
@@ -556,7 +556,7 @@ typeof db
 ~~~
 
 Show all methods of the db object
-~~~ps1
+~~~js
 mongosh
 
 db. # press tab twice to show all methods of the db object
@@ -564,7 +564,7 @@ db.c # press tab twice to show all commands having the prefix c
 ~~~
 
 Show a function declaration
-~~~ps1
+~~~js
 mongosh
 
 db.version
@@ -586,7 +586,7 @@ db.version
 ~~~
 
 Call a function
-~~~ps1
+~~~js
 mongosh
 
 db.version()
@@ -629,7 +629,7 @@ db.version()
     - Be carefull when converting date, because the month number start with 0 (January) for example. The output date could converted to the corresponding time zone date, or to UTC datetime.
 
 Illustration
-~~~ps1
+~~~js
 mongosh
 
 var obj = {a: "", b: {}, c: [], d: true};
@@ -653,14 +653,14 @@ test>
 ~~~
 
 Generate an objecid
-~~~ps1
+~~~js
 mongosh
 
 ObjectId()
 # Output: ObjectId("65a6a8da4bd4f647147298dd")
 ~~~
 
-~~~ps1
+~~~js
 mongosh
 
 new Date()
@@ -709,7 +709,7 @@ In this section:
 |db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
 Create a collection in the active database
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MockDatabase
@@ -719,7 +719,7 @@ MockDatabase> show collections
 ~~~
 
 Practice
-~~~ps1
+~~~js
 //Connect to mongodb shell
 mongosh mongodb://root:root@localhost:27017
 
@@ -753,18 +753,18 @@ show dbs
 ### Collection Methods
 
 Create
-~~~ps1
+~~~js
 db.createCollection("cn")
 ~~~
 
 Read
-~~~ps1
+~~~js
 db.getCollection("cn").find(<o> or <aoo>)
 db.getCollection("Collection1").findOne(<o>)
 ~~~
 
 Update
-~~~ps1
+~~~js
 db.getCollection("cn").insertOne(<o>)
 db.getCollection("cn").findOneAndUpdate(<o>)
 b.getCollection("cn").findOneAndReplace(<o>)
@@ -772,7 +772,7 @@ db.getCollection("cn").insertMany(<aoo>)
 ~~~
 
 Delete
-~~~ps1
+~~~js
 db.getCollection("cn").deleteOne(<o>)
 db.getCollection("cn").findOneAndDelete(<o>)
 db.getCollection("cn").deleteMany(<aoo>)
@@ -782,7 +782,7 @@ db.getCollection("cn").drop()
 ### Collection Methods - Insert / Delete Documents
 
 Insert one or many documents
-~~~ps1
+~~~js
 db.getCollection("cn").insert(<o> or <aoo>)
 {
     return WriteResult() or BulkWriteResult() Object # Information about how many documents were inserted
@@ -800,7 +800,7 @@ db.getCollection("cn").insertMany(<aoo>)
 ~~~
 
 Practice
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MyDB
@@ -886,7 +886,7 @@ db.getCollection("Collection1").findOne({"Boolean": true})
 Warning: NumberLong: specifying a number as argument is deprecated and may lead to loss of precision, pass a string instead.
 
 Challenge
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MyDB
@@ -926,7 +926,7 @@ db.getCollection("Collection2").findOne({})
 
 
 Find one or many documents
-~~~ps1
+~~~js
 db.getCollection("cn").find(<q> or <sof>)
 {
     return Cursor() Object # to iterate over to get documents in Extended JSON format
@@ -946,6 +946,43 @@ db.getCollection("cn").findOne(<q> or <sof>)
     - A MongoDB client (MongoDB Compass or Mongo Shell for example) call the find() function to retrieve documents stored in a MongoDB server.
     - MongoDB server will filter the set documents corresponding to the search creteria. It will return a cursor pointing to the beginning of the set of documents instead of returning the set of documents directly. 
     - Subsets of documents (so called `batchs`) according to the `batch size` defined on the client, will be returned until the set is emptied.
+
+
+Practice: 
+- Create a collection named Cursor and add 100 documents inside
+- document key: index
+- document value: 1 to 100
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+db.createCollection("Cursor");
+
+var docsCount = 0;
+
+docsCount = db.getCollection("Cursor").find({}).count();
+
+print("# Documents: " + docsCount);
+
+var docs = [];
+
+for (let i = 1; i <= 100; i++) 
+{
+    obj = 
+    {
+        index: NumberInt(i)
+    }
+    docs.push(obj);
+}
+
+db.getCollection("Cursor").insertMany(docs);
+
+docsCount = db.getCollection("Cursor").find({}).count();
+
+print("# Documents: " + docsCount);
+~~~
+
   
 
   
