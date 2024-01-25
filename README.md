@@ -679,6 +679,8 @@ In this section:
 - `cn` will stand for `CollectionName`
 - `o` will stand for `Object`
 - `aoo` will stand for `ArrayOfObjects`
+- `q` will stand for `query`
+- `sof` will stand for `SetOfFields`
 
 | Command | Description |
 |---|---|
@@ -922,6 +924,28 @@ db.getCollection("Collection2").findOne({})
 
 ### Collection Methods - Read Documents
 
+
+Find one or many documents
+~~~ps1
+db.getCollection("cn").find(<q> or <sof>)
+{
+    return Cursor() Object # to iterate over to get documents in Extended JSON format
+}
+
+db.getCollection("cn").findOne(<q> or <sof>)
+{
+    return Document() Object # in Extended JSON format
+}
+~~~
+
+:memo: Memo
+- A `cursor` object is a pointer to the start of an iterable object before its first child element. - It allows you to performe some actions on subsets of an iterable object by iterating over it. 
+- It desappear when it reach the end of the iterable object.
+- The iteration can happen one by one or subset by subset until there is no more elements in the object.
+- A `cursor in MongoDB` works as follows:
+    - A MongoDB client (MongoDB Compass or Mongo Shell for example) call the find() function to retrieve documents stored in a MongoDB server.
+    - MongoDB server will filter the set documents corresponding to the search creteria. It will return a cursor pointing to the beginning of the set of documents instead of returning the set of documents directly. 
+    - Subsets of documents (so called `batchs`) according to the `batch size` defined on the client, will be returned until the set is emptied.
   
 
   
