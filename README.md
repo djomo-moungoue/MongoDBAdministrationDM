@@ -1157,6 +1157,116 @@ Set-Content -Path $BackupSystemEnvVarPath -Value ([Environment]::GetEnvironmentV
 wireshark.exe &
 ~~~
 
+If capture won't work with this error message
+~~~
+Local interfaces are unavailable because no packet capture driver is installed.
+You can fix this by installing Npcap.
+~~~
+
+Install Npcap. It is the Nmap Project's packet capture (and sending) library for Microsoft Windows. 
+~~~
+winget search --name npcap
+
+winget install --id Insecure.Npcap --exact --source winget --silent
+~~~
+
+Retrieve the TCP connections of MongoDB server on port 27017
+~~~ps1
+<# 
+The Get-NetTCPConnection cmdlet gets current TCP connections. Use this cmdlet to view TCP connection properties such as local or remote IP address, local or remote port, and connection state.
+#>
+Get-NetTCPConnection -LocalPort 27017
+<#
+LocalAddress                        LocalPort RemoteAddress                       RemotePo
+                                                                                  rt       
+------------                        --------- -------------                       -------- 
+127.0.0.1                           27017     127.0.0.1                           58017    
+127.0.0.1                           27017     127.0.0.1                           58014    
+127.0.0.1                           27017     127.0.0.1                           58013    
+127.0.0.1                           27017     127.0.0.1                           58027    
+127.0.0.1                           27017     127.0.0.1                           58015    
+127.0.0.1                           27017     127.0.0.1                           57390    
+127.0.0.1                           27017     127.0.0.1                           58016    
+127.0.0.1                           27017     127.0.0.1                           58018    
+127.0.0.1                           27017     127.0.0.1                           58019    
+127.0.0.1                           27017     127.0.0.1                           58028    
+127.0.0.1                           27017     127.0.0.1                           56868    
+127.0.0.1                           27017     127.0.0.1                           56856    
+0.0.0.0                             27017     0.0.0.0                             0  
+#>
+~~~
+
+Retrieve all connected IPv4 Network interfaces
+~~~ps1
+<#
+The Get-NetIPInterface cmdlet gets an IP interface, including IPv4 and IPv6 addresses, and the associated address configuration for the IP interfaces. Without parameters, this cmdlet gets all of the IP interface properties on the computer, including virtual interfaces and loopback interfaces.
+#>
+# Retrieve all connected IPv4 Network interfaces
+Get-NetIPInterface -AddressFamily IPv4 -ConnectionState connected
+<#
+ifIndex InterfaceAlias                  AddressFamily NlMtu(Bytes) InterfaceMetric Dhcp     ConnectionState PolicyStore
+------- --------------                  ------------- ------------ --------------- ----     --------------- -----------
+46      Npcap Loopback Adapter          IPv4                  1500              25 Enabled  Connected       ActiveStore
+17      Ethernet 2                      IPv4                  1500              25 Disabled Connected       ActiveStore
+1       Loopback Pseudo-Interface 1     IPv4            4294967295              75 Disabled Connected       ActiveStore
+15      WLAN                            IPv4                  1500              35 Enabled  Connected       ActiveStore
+#>
+~~~
+
+Retrieve which network interface localhost is running on 
+~~~ps1
+<#
+The Get-NetIPAddress cmdlet gets the IP address configuration, such as IPv4 addresses, IPv6 addresses and the IP interfaces with which addresses are associated. Without parameters, this cmdlet gets the entire IP address configuration for the computer
+#>
+# Retrieve which network interface localhost is running on
+Get-NetIPAddress -AddressFamily IPv4 -IPAddress "127.0.0.1"
+<#
+IPAddress         : 127.0.0.1
+InterfaceIndex    : 1
+InterfaceAlias    : Loopback Pseudo-Interface 1
+AddressFamily     : IPv4
+Type              : Unicast
+PrefixLength      : 8
+PrefixOrigin      : WellKnown
+SuffixOrigin      : WellKnown
+AddressState      : Preferred
+ValidLifetime     : Infinite ([TimeSpan]::MaxValue)
+PreferredLifetime : Infinite ([TimeSpan]::MaxValue)
+SkipAsSource      : False
+PolicyStore       : ActiveStore
+#>
+~~~
+
+Run the wireshark application
+~~~ps1
+wireshark.exe &
+~~~
+In the search field write this (the ip address of the MongoDB server session)
+> ip.addr == 127.0.0.1
+
+Open Capture / Options
+
+Choose the Capture interface
+> Npcap Loopback Adapther
+
+Capture filter for selected interfaces
+> src port 27017
+
+Click `start capture`
+~~~
+
+Retrieve all documents by setting the server batch size to 30.
+~~~js
+db.getCollection("Cursor").find().batchSize(30)
+~~~
+
+:memo: Memo
+- The batch size define how many request the MongoDB client will make to the MongoDB server. 
+- Number of requests = Number of documents matching the find filter / batchSize
+- So doesn't set the batch size too small.
+
+Right click on the stream with the biggest length, Follow / TCP Stream. You can observe on the following picture that the MongoDB send 30 documents to the MongoDB client at a time:
+![MongoDB Batch Size Inspection Using Wireshark](MongoDBBatchSizeInspectionUsingWireshark.JPG)
 
   
                                
