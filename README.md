@@ -1178,7 +1178,7 @@ $ExtendedUserEnvVar = $UserEnvVar+";"+$NewPath
 
 Launch Robo3T application
 ~~~ps1
-robo3t.exe &
+robo3t.exe
 ~~~
 
 Then experiment in Robt3T
