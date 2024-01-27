@@ -1165,6 +1165,22 @@ winget search --name robo3t
 winget install --id 3TSoftwareLabs.Robo3T --exact --source winget --silent
 ~~~
 
+Append the path to Robot3T executable to the user environment variable
+~~~ps1
+$UserEnvVar = [Environment]::GetEnvironmentVariable('Path', 'User');
+$NewPath = "C:\Program Files\Robo 3T 1.4.4";
+$ExtendedUserEnvVar = $UserEnvVar+";"+$NewPath
+# Apply the change
+[Environment]::SetEnvironmentVariable('Path', $ExtendedUserEnvVar, 'User');
+# Double check
+[Environment]::GetEnvironmentVariable('Path', 'User');
+~~~
+
+Launch Robo3T application
+~~~ps1
+robo3t.exe &
+~~~
+
 Then experiment in Robt3T
 ~~~js
 var oneDocument = db.getCollection("Cursor").findOne();
