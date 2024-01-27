@@ -430,20 +430,20 @@ Build Info: {
 
 Or
 
-~~~ps1
+~~~js
 mongosh
 
 db.version()
-# 6.0.6
+// 6.0.6
 ~~~
 
 Verify which JavaScript engine is used in you MongoDB Server
-~~~ps1
+~~~js
 mongosh
 
 db.serverBuildInfo()
 
-<# Output example
+/*
 {
   version: '6.0.6',
   gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7',
@@ -473,7 +473,7 @@ db.serverBuildInfo()
   storageEngines: [ 'devnull', 'ephemeralForTest', 'wiredTiger' ],
   ok: 1
 }
-#>
+*/
 ~~~
 
 ### MongoDB Shell
@@ -486,25 +486,25 @@ MongoDB Shell:
 - :five: uses `mongosh` in Windows OS and `mongo` in Linux and Mac OS to start his console
 
 MongoDB Shell Version
-~~~ps1
+~~~js
 mongosh --version
-# 1.10.1
+// 1.10.1
 ~~~
 
 Or
 
-~~~ps1
+~~~js
 mongosh
 
 version()
-# 1.10.1
+// 1.10.1
 ~~~
 
 Show available commands
-~~~mongosh
+~~~js
 help
 
-<#
+/*
 `use` : Set current database
 
 `show` :
@@ -545,30 +545,30 @@ it	result of the last line evaluated; use to further iterate
 `cls`	Clears the screen like console.clear()
 
 `isInteractive`	Returns whether the shell will enter or has entered interactive mode
-#>
+*/
 ~~~
 
-~~~ps1
+~~~js
 mongosh
 
 typeof db
-# Output: object
+// object
 ~~~
 
 Show all methods of the db object
-~~~ps1
+~~~js
 mongosh
 
-db. # press tab twice to show all methods of the db object
-db.c # press tab twice to show all commands having the prefix c
+db. // press tab twice to show all methods of the db object
+db.c // press tab twice to show all commands having the prefix c
 ~~~
 
 Show a function declaration
-~~~ps1
+~~~js
 mongosh
 
 db.version
-<# Output example
+/*
 [Function: version] AsyncFunction {
   apiVersions: [ 0, 0 ],
   returnsPromise: true,
@@ -582,15 +582,15 @@ db.version
   shellCommandCompleter: undefined,
   help: [Function (anonymous)] Help
 }
-#>
+*/
 ~~~
 
 Call a function
-~~~ps1
+~~~js
 mongosh
 
 db.version()
-# 6.0.6
+// 6.0.6
 ~~~
 
 
@@ -629,12 +629,12 @@ db.version()
     - Be carefull when converting date, because the month number start with 0 (January) for example. The output date could converted to the corresponding time zone date, or to UTC datetime.
 
 Illustration
-~~~ps1
+~~~js
 mongosh
 
 var obj = {a: "", b: {}, c: [], d: true};
 print(obj);
-#Output: { a: '', b: {}, c: [], d: true }
+// { a: '', b: {}, c: [], d: true }
 
 typeof obj.a;
 typeof obj.b;
@@ -642,35 +642,35 @@ typeof obj.c;
 obj.c instanceof Array;
 typeof obj.d;
 
-<# Output
+/*
 string
 object
 object
 true
 boolean
 test>
-#>
+*/
 ~~~
 
 Generate an objecid
-~~~ps1
+~~~js
 mongosh
 
 ObjectId()
-# Output: ObjectId("65a6a8da4bd4f647147298dd")
+// ObjectId("65a6a8da4bd4f647147298dd")
 ~~~
 
-~~~ps1
+~~~js
 mongosh
 
 new Date()
 #Output: ISODate("2024-01-16T16:12:52.384Z")
 
 ISODate()
-#Output: ISODate("2024-01-16T16:12:59.916Z")
+// ISODate("2024-01-16T16:12:59.916Z")
 
 Date()
-#Output: Tue Jan 16 2024 17:17:50 GMT+0100 (Central European Standard Time)
+// Tue Jan 16 2024 17:17:50 GMT+0100 (Central European Standard Time)
 ~~~
 
 ## Explore Databases and Collections
@@ -709,17 +709,17 @@ In this section:
 |db.grantPrivilegesToRole()||db.isMaster(), db.logout(), db.shutdownServer()|
 
 Create a collection in the active database
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MockDatabase
 MockDatabase> db.createCollection("MockUsers")
 MockDatabase> show collections
-# MockUsers
+// MockUsers
 ~~~
 
 Practice
-~~~ps1
+~~~js
 //Connect to mongodb shell
 mongosh mongodb://root:root@localhost:27017
 
@@ -753,18 +753,18 @@ show dbs
 ### Collection Methods
 
 Create
-~~~ps1
+~~~js
 db.createCollection("cn")
 ~~~
 
 Read
-~~~ps1
+~~~js
 db.getCollection("cn").find(<o> or <aoo>)
 db.getCollection("Collection1").findOne(<o>)
 ~~~
 
 Update
-~~~ps1
+~~~js
 db.getCollection("cn").insertOne(<o>)
 db.getCollection("cn").findOneAndUpdate(<o>)
 b.getCollection("cn").findOneAndReplace(<o>)
@@ -772,7 +772,7 @@ db.getCollection("cn").insertMany(<aoo>)
 ~~~
 
 Delete
-~~~ps1
+~~~js
 db.getCollection("cn").deleteOne(<o>)
 db.getCollection("cn").findOneAndDelete(<o>)
 db.getCollection("cn").deleteMany(<aoo>)
@@ -782,7 +782,7 @@ db.getCollection("cn").drop()
 ### Collection Methods - Insert / Delete Documents
 
 Insert one or many documents
-~~~ps1
+~~~js
 db.getCollection("cn").insert(<o> or <aoo>)
 {
     return WriteResult() or BulkWriteResult() Object # Information about how many documents were inserted
@@ -800,7 +800,7 @@ db.getCollection("cn").insertMany(<aoo>)
 ~~~
 
 Practice
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MyDB
@@ -886,7 +886,7 @@ db.getCollection("Collection1").findOne({"Boolean": true})
 Warning: NumberLong: specifying a number as argument is deprecated and may lead to loss of precision, pass a string instead.
 
 Challenge
-~~~ps1
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MyDB
@@ -926,7 +926,7 @@ db.getCollection("Collection2").findOne({})
 
 
 Find one or many documents
-~~~ps1
+~~~js
 db.getCollection("cn").find(<q> or <sof>)
 {
     return Cursor() Object # to iterate over to get documents in Extended JSON format
@@ -940,13 +940,430 @@ db.getCollection("cn").findOne(<q> or <sof>)
 
 :memo: Memo
 - A `cursor` object is a pointer to the start of an iterable object before its first child element. - It allows you to performe some actions on subsets of an iterable object by iterating over it. 
-- It desappear when it reach the end of the iterable object.
+- It become exhausted when it reaches the end of the iterable object.
 - The iteration can happen one by one or subset by subset until there is no more elements in the object.
 - A `cursor in MongoDB` works as follows:
     - A MongoDB client (MongoDB Compass or Mongo Shell for example) call the find() function to retrieve documents stored in a MongoDB server.
     - MongoDB server will filter the set documents corresponding to the search creteria. It will return a cursor pointing to the beginning of the set of documents instead of returning the set of documents directly. 
     - Subsets of documents (so called `batchs`) according to the `batch size` defined on the client, will be returned until the set is emptied.
-  
+
+
+Practice: 
+- Create a collection named Cursor and add 100 documents inside
+- document key: index
+- document value: 1 to 100
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+db.createCollection("Cursor");
+
+var docsCount = 0;
+
+docsCount = db.getCollection("Cursor").find({}).count();
+
+print("# Documents: " + docsCount);
+
+var docs = [];
+
+for (let i = 101; i <= 300; i++) 
+{
+    obj = 
+    {
+        index: NumberInt(i)
+    }
+    docs.push(obj);
+}
+
+db.getCollection("Cursor").insertMany(docs);
+
+docsCount = db.getCollection("Cursor").find({}).count();
+
+print("# Documents: " + docsCount);
+~~~
+
+Experiment The Cursor iteration in mongosh
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+//Iterator size = 20
+db.getCollection("Cursor").find({});
+/*
+[
+  { _id: ObjectId("65b264b5390fdbde5df22cc4"), index: 1 },
+  { _id: ObjectId("65b264b5390fdbde5df22cc5"), index: 2 },
+  { _id: ObjectId("65b264b5390fdbde5df22cc6"), index: 3 },
+  { _id: ObjectId("65b264b5390fdbde5df22cc7"), index: 4 },
+  { _id: ObjectId("65b264b5390fdbde5df22cc8"), index: 5 },
+  { _id: ObjectId("65b264b5390fdbde5df22cc9"), index: 6 },
+  { _id: ObjectId("65b264b5390fdbde5df22cca"), index: 7 },
+  { _id: ObjectId("65b264b5390fdbde5df22ccb"), index: 8 },
+  { _id: ObjectId("65b264b5390fdbde5df22ccc"), index: 9 },
+  { _id: ObjectId("65b264b5390fdbde5df22ccd"), index: 10 },
+  { _id: ObjectId("65b264b5390fdbde5df22cce"), index: 11 },
+  { _id: ObjectId("65b264b5390fdbde5df22ccf"), index: 12 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd0"), index: 13 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd1"), index: 14 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd2"), index: 15 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd3"), index: 16 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd4"), index: 17 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd5"), index: 18 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd6"), index: 19 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd7"), index: 20 }
+]
+Type "it" for more
+MyDB> it
+[
+  { _id: ObjectId("65b264b5390fdbde5df22cd8"), index: 21 },
+  { _id: ObjectId("65b264b5390fdbde5df22cd9"), index: 22 },
+  { _id: ObjectId("65b264b5390fdbde5df22cda"), index: 23 },
+  { _id: ObjectId("65b264b5390fdbde5df22cdb"), index: 24 },
+  { _id: ObjectId("65b264b5390fdbde5df22cdc"), index: 25 },
+  { _id: ObjectId("65b264b5390fdbde5df22cdd"), index: 26 },
+  { _id: ObjectId("65b264b5390fdbde5df22cde"), index: 27 },
+  { _id: ObjectId("65b264b5390fdbde5df22cdf"), index: 28 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce0"), index: 29 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce1"), index: 30 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce2"), index: 31 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce3"), index: 32 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce4"), index: 33 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce5"), index: 34 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce6"), index: 35 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce7"), index: 36 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce8"), index: 37 },
+  { _id: ObjectId("65b264b5390fdbde5df22ce9"), index: 38 },
+  { _id: ObjectId("65b264b5390fdbde5df22cea"), index: 39 },
+  { _id: ObjectId("65b264b5390fdbde5df22ceb"), index: 40 }
+]
+Type "it" for more
+...
+MyDB> it
+no cursor
+*/
+
+//And so on, until the end of the result set is reached.
+~~~
+
+:memo: Memo
+- The `batch size` is the number of documents the mongodb server can send to the mongodb client in one shift. 
+- The `iterator size`, also called display batch size, is the number of documents from a batch on the client side we can get after each iteration.
+- The maximum batch size is `16 MB`.
+- The default iterator size is `20 documents`.
+
+Assign the automatic cursor iteration by assigning it to a variable
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+//Store the cursor in myCursor
+var myCursor = db.getCollection("Cursor").find({});
+
+//Start cursor iteration manually to the number of documents corresponding to the iteration size defined
+myCursor;
+
+//Display the next element one at a time if it exist.
+if(myCursor.hasNext())
+{
+    myCursor.next(3);
+}
+
+//Iterate the cursor and access documents
+myCursor.forEach(printjson);
+
+//Store the cursor in myCursor
+var myCursor = db.getCollection("Cursor").find({index: {$lte: 10}});
+if (myCursor.hasNext()){
+    var documentArray = myCursor.toArray();
+    print("if");
+} else {//If the cursor is exhausted let it point again at the beginning of the search result set
+    
+    //Store the cursor in myCursor
+    var myCursor = db.getCollection("Cursor").find({index: {$lte: 10}});
+
+    // The toArray() method loads into RAM all documents returned by the cursor; the toArray() method exhausts the cursor.
+    var documentArray = myCursor.toArray();
+    print("else");
+}
+documentArray;
+~~~
+
+Cursor Helper Methods
+~~~js
+//Assign Cursor to a varaiable
+var cursor = db.getCollection("cn").find();
+
+//Iterate one document
+cursor.next();
+
+//Check if cursor has next document
+cursor.hasNext();
+
+//Quantity of documents left in current batch
+cursor.objsLeftInBatch();
+
+//Iterate all documents in ther cursor and push them to he array
+cursor.toArray()
+
+//Iterate all documents in the cursor and perform operation with each of them
+cursor.forEach(\<function\>)
+
+//Example
+var cursor = db.getCollection("Cursor").find({index: {$lte: 15}});
+cursor.forEach(printjson)
+cursor.forEach(doc => print(`Index of the doc is ${doc.index}`));
+//cursor.forEach(doc => print(`${doc}`)); print [objec object]
+//cursor.forEach(doc => print("Index of the doc is ${doc.index}")); print static text
+
+// Count number of documents in the cursor
+cursor.count()
+
+// Limit the number of documents in the cursor
+cursor.limit(\<number\>)
+
+// Skip certain number of documents in the cursor
+cursor.skip(\<number\>)
+
+// Sort documents in the cursor. 1 ascending order (default). -1 descending order.
+cursor.sort({\<fieldName1\>: 1, \<fieldName2\>: -1, ...})
+
+// The execution precedence is sort documents on the cursor, skip certain documents and limit the number of documents.
+cursor.limit().skip().sort();
+
+cursor.limit().skip().sort().count();
+
+// Returns One Document in Extended JSON format
+db.getCollection("Cursor").findOne(\<query\>, \<fields\>;)
+~~~
+
+:memo: Memo: 
+- Indepedently in which order they are chained, the precedence when called together is sort, skip and limit.
+- limit, skip and sort don't impact the result of the count method. It allways returns the total number of documents in the cursor.
+
+Challenge 1
+~~~js
+var cursor = db.getCollection("Cursor").find({index: {$lte: 100}});
+cursor.sort({index: -1}).skip(27).limit(4);
+~~~
+
+Challenge 2
+~~~js
+var cursor = db.getCollection("Cursor").find({index: {$lte: 100}});
+var newCursor = cursor.sort({index: 1}).skip(65).limit(8);
+newCursor.forEach(doc => print(`Document with _id ObjectId("${doc._id}") has index ${doc.index}`));
+~~~
+
+How to display a method implementation
+
+First install Robot3T
+~~~ps1
+winget search --name robo3t 
+
+winget install --id 3TSoftwareLabs.Robo3T --exact --source winget --silent
+~~~
+
+Append the path to Robot3T executable to the user environment variable
+~~~ps1
+$UserEnvVar = [Environment]::GetEnvironmentVariable('Path', 'User');
+$NewPath = "C:\Program Files\Robo 3T 1.4.4";
+$ExtendedUserEnvVar = $UserEnvVar+";"+$NewPath
+# Apply the change
+[Environment]::SetEnvironmentVariable('Path', $ExtendedUserEnvVar, 'User');
+# Double check
+[Environment]::GetEnvironmentVariable('Path', 'User');
+~~~
+
+Launch Robo3T application
+~~~ps1
+robo3t.exe &
+~~~
+
+Then experiment in Robt3T
+~~~js
+var oneDocument = db.getCollection("Cursor").findOne();
+oneDocument.
+~~~
+
+Retrieve and modify the iterator size
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+DBQuery.shellBatchSize = 30
+/*DeprecationWarning: DBQuery.shellBatchSize is deprecated, please use config.set("displayBatchSize") instead
+30
+*/
+
+//display the current batch size
+config.get("displayBatchSize");
+//20
+
+//modify the current batch size
+config.set("displayBatchSize") = 10;
+
+//set the batch size to his default value
+config.get("displayBatchSize");
+~~~
+
+Examine what happens behind the scene between mongodb server and client
+
+Install the application wireshark by starting PowerShell with administrator priviledges
+~~~ps1
+# Display which wireshark pakages are available
+winget search --name wireshark
+
+# Install the current version of wireshark
+winget install --id WiresharkFoundation.Wireshark --exact --source winget --silent
+
+# By successfull installation append the path to wireshark executable to the user envinronment variables Path attribute
+#-----------------USER PROFILE ENVIRONMENT VARIABLE PATH---------------------
+
+# Backup the current user and system environment variable PATH
+$BackupUserEnvVarPath = "$env:USERPROFILE\BackupUserEnvVarPath.csv"
+if(!(Test-Path $BackupUserEnvVarPath))
+{
+    New-Item $BackupUserEnvVarPath
+}
+$UserEnvPath =  [Environment]::GetEnvironmentVariable('Path', 'User')
+Set-Content -Path $BackupUserEnvVarPath -Value $UserEnvPath
+#Get-Content $BackupUserEnvVarPath 
+
+# Append the new path the user environment variable
+$UserEnvPath = $UserEnvPath+";"+"C:\Program Files\Wireshark"
+[Environment]::SetEnvironmentVariable('Path', $UserEnvPath, 'User')
+
+# Verify
+[Environment]::GetEnvironmentVariable('Path', 'User')
+
+#-----------------SYSTEM ENVIRONMENT VARIABLE PATH---------------------
+
+$BackupSystemEnvVarPath = "$env:USERPROFILE\BackupSystemEnvVarPath.csv"
+if(!(Test-Path $BackupSystemEnvVarPath))
+{
+    New-Item $BackupSystemEnvVarPath
+}
+
+Set-Content -Path $BackupSystemEnvVarPath -Value ([Environment]::GetEnvironmentVariable('Path', 'Machine'))
+#Get-Content $BackupSystemEnvVarPath
+[Environment]::GetEnvironmentVariable('Path', 'Machine')
+
+# Start the wireshark application
+wireshark.exe &
+~~~
+
+If capture won't work with this error message
+~~~
+Local interfaces are unavailable because no packet capture driver is installed.
+You can fix this by installing Npcap.
+~~~
+
+Install Npcap. It is the Nmap Project's packet capture (and sending) library for Microsoft Windows. 
+~~~
+winget search --name npcap
+
+winget install --id Insecure.Npcap --exact --source winget --silent
+~~~
+
+Retrieve the TCP connections of MongoDB server on port 27017
+~~~ps1
+<# 
+The Get-NetTCPConnection cmdlet gets current TCP connections. Use this cmdlet to view TCP connection properties such as local or remote IP address, local or remote port, and connection state.
+#>
+Get-NetTCPConnection -LocalPort 27017
+<#
+LocalAddress                        LocalPort RemoteAddress                       RemotePo
+                                                                                  rt       
+------------                        --------- -------------                       -------- 
+127.0.0.1                           27017     127.0.0.1                           58017    
+127.0.0.1                           27017     127.0.0.1                           58014    
+127.0.0.1                           27017     127.0.0.1                           58013    
+127.0.0.1                           27017     127.0.0.1                           58027    
+127.0.0.1                           27017     127.0.0.1                           58015    
+127.0.0.1                           27017     127.0.0.1                           57390    
+127.0.0.1                           27017     127.0.0.1                           58016    
+127.0.0.1                           27017     127.0.0.1                           58018    
+127.0.0.1                           27017     127.0.0.1                           58019    
+127.0.0.1                           27017     127.0.0.1                           58028    
+127.0.0.1                           27017     127.0.0.1                           56868    
+127.0.0.1                           27017     127.0.0.1                           56856    
+0.0.0.0                             27017     0.0.0.0                             0  
+#>
+~~~
+
+Retrieve all connected IPv4 Network interfaces
+~~~ps1
+<#
+The Get-NetIPInterface cmdlet gets an IP interface, including IPv4 and IPv6 addresses, and the associated address configuration for the IP interfaces. Without parameters, this cmdlet gets all of the IP interface properties on the computer, including virtual interfaces and loopback interfaces.
+#>
+# Retrieve all connected IPv4 Network interfaces
+Get-NetIPInterface -AddressFamily IPv4 -ConnectionState connected
+<#
+ifIndex InterfaceAlias                  AddressFamily NlMtu(Bytes) InterfaceMetric Dhcp     ConnectionState PolicyStore
+------- --------------                  ------------- ------------ --------------- ----     --------------- -----------
+46      Npcap Loopback Adapter          IPv4                  1500              25 Enabled  Connected       ActiveStore
+17      Ethernet 2                      IPv4                  1500              25 Disabled Connected       ActiveStore
+1       Loopback Pseudo-Interface 1     IPv4            4294967295              75 Disabled Connected       ActiveStore
+15      WLAN                            IPv4                  1500              35 Enabled  Connected       ActiveStore
+#>
+~~~
+
+Retrieve which network interface localhost is running on 
+~~~ps1
+<#
+The Get-NetIPAddress cmdlet gets the IP address configuration, such as IPv4 addresses, IPv6 addresses and the IP interfaces with which addresses are associated. Without parameters, this cmdlet gets the entire IP address configuration for the computer
+#>
+# Retrieve which network interface localhost is running on
+Get-NetIPAddress -AddressFamily IPv4 -IPAddress "127.0.0.1"
+<#
+IPAddress         : 127.0.0.1
+InterfaceIndex    : 1
+InterfaceAlias    : Loopback Pseudo-Interface 1
+AddressFamily     : IPv4
+Type              : Unicast
+PrefixLength      : 8
+PrefixOrigin      : WellKnown
+SuffixOrigin      : WellKnown
+AddressState      : Preferred
+ValidLifetime     : Infinite ([TimeSpan]::MaxValue)
+PreferredLifetime : Infinite ([TimeSpan]::MaxValue)
+SkipAsSource      : False
+PolicyStore       : ActiveStore
+#>
+~~~
+
+Run the wireshark application
+~~~ps1
+wireshark.exe &
+~~~
+
+In the search field write this (the ip address of the MongoDB server session)
+> ip.addr == 127.0.0.1
+
+Open Capture / Options
+
+Choose the Capture interface
+> Npcap Loopback Adapther
+
+Capture filter for selected interfaces
+> src port 27017
+
+Click `start capture`
+
+
+Retrieve all documents by setting the server batch size to 30.
+~~~js
+db.getCollection("Cursor").find().batchSize(30)
+~~~
+
+:memo: Memo
+- The `batch size` is the maximal number of documents that can be sent from the MongoDB server to the client in a one response. 
+- Number of requests = Number of documents matching the find filter / batchSize
+- So doesn't set the batch size too small.
+
+Right click on the stream with the biggest length, Follow / TCP Stream. You can observe on the following picture that the MongoDB send 30 documents to the MongoDB client at a time:
+![MongoDB Batch Size Inspection Using Wireshark](MongoDBBatchSizeInspectionUsingWireshark.JPG)
 
   
                                
