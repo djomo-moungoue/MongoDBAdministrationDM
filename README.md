@@ -1091,6 +1091,86 @@ if (myCursor.hasNext()){
 documentArray;
 ~~~
 
+Cursor Helper Methods
+~~~js
+//Assign Cursor to a varaiable
+var cursor = db.getCollection("cn").find();
+
+//Iterate one document
+cursor.next();
+
+//Check if cursor has next document
+cursor.hasNext();
+
+//Quantity of documents left in current batch
+cursor.objsLeftInBatch();
+
+//Iterate all documents in ther cursor and push them to he array
+cursor.toArray()
+
+//Iterate all documents in the cursor and perform operation with each of them
+cursor.forEach(\<function\>)
+
+//Example
+var cursor = db.getCollection("Cursor").find({index: {$lte: 15}});
+cursor.forEach(printjson)
+cursor.forEach(doc => print(`Index of the doc is ${doc.index}`));
+//cursor.forEach(doc => print(`${doc}`)); print [objec object]
+//cursor.forEach(doc => print("Index of the doc is ${doc.index}")); print static text
+
+// Count number of documents in the cursor
+cursor.count()
+
+// Limit the number of documents in the cursor
+cursor.limit(\<number\>)
+
+// Skip certain number of documents in the cursor
+cursor.skip(\<number\>)
+
+// Sort documents in the cursor. 1 ascending order (default). -1 descending order.
+cursor.sort({\<fieldName1\>: 1, \<fieldName2\>: -1, ...})
+
+// The execution precedence is sort documents on the cursor, skip certain documents and limit the number of documents.
+cursor.limit().skip().sort();
+
+cursor.limit().skip().sort().count();
+
+// Returns One Document in Extended JSON format
+db.getCollection("Cursor").findOne(\<query\>, \<fields\>;)
+~~~
+
+:memo: Memo: 
+- Indepedently in which order they are chained, the precedence when called together is sort, skip and limit.
+- limit, skip and sort don't impact the result of the count method. It allways returns the total number of documents in the cursor.
+
+Challenge 1
+~~~js
+var cursor = db.getCollection("Cursor").find({index: {$lte: 100}});
+cursor.sort({index: -1}).skip(27).limit(4);
+~~~
+
+Challenge 2
+~~~js
+var cursor = db.getCollection("Cursor").find({index: {$lte: 100}});
+var newCursor = cursor.sort({index: 1}).skip(65).limit(8);
+newCursor.forEach(doc => print(`Document with _id ObjectId("${doc._id}") has index ${doc.index}`));
+~~~
+
+How to display a method implementation
+
+First install Robot3T
+~~~ps1
+winget search --name robo3t 
+
+winget install --id 3TSoftwareLabs.Robo3T --exact --source winget --silent
+~~~
+
+Then experiment in Robt3T
+~~~js
+var oneDocument = db.getCollection("Cursor").findOne();
+oneDocument.
+~~~
+
 Retrieve and modify the iterator size
 ~~~js
 mongosh mongodb://root:root@localhost:27017
@@ -1241,6 +1321,7 @@ Run the wireshark application
 ~~~ps1
 wireshark.exe &
 ~~~
+
 In the search field write this (the ip address of the MongoDB server session)
 > ip.addr == 127.0.0.1
 
@@ -1253,7 +1334,7 @@ Capture filter for selected interfaces
 > src port 27017
 
 Click `start capture`
-~~~
+
 
 Retrieve all documents by setting the server batch size to 30.
 ~~~js
@@ -1261,7 +1342,7 @@ db.getCollection("Cursor").find().batchSize(30)
 ~~~
 
 :memo: Memo
-- The batch size define how many request the MongoDB client will make to the MongoDB server. 
+- The `batch size` is the maximal number of documents that can be sent from the MongoDB server to the client in a one response. 
 - Number of requests = Number of documents matching the find filter / batchSize
 - So doesn't set the batch size too small.
 
