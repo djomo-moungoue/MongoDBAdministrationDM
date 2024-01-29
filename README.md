@@ -1365,6 +1365,79 @@ db.getCollection("Cursor").find().batchSize(30)
 Right click on the stream with the biggest length, Follow / TCP Stream. You can observe on the following picture that the MongoDB send 30 documents to the MongoDB client at a time:
 ![MongoDB Batch Size Inspection Using Wireshark](MongoDBBatchSizeInspectionUsingWireshark.JPG)
 
+## Query MongoDB
+
+You can generate random json objects to query in this website: [JSON GENERATOR](https://json-generator.com/).
+
+Query data set:
+- Path: ".\UdemyTutoDocs\persons.json"
+- Number of objects: 1000
+
+Obect property data types:
+- _id: ObjectId
+- index: Int32
+- name: String
+- isActive: Boolean
+- registered: Date
+- age: Int32
+- gender: String
+- eyeColor: String
+- favouriteFruit: String
+- comapany: Object
+    - title: String
+    - email: String
+    - phone: String
+    - location: Object
+        - country: String
+        - address: String
+- tags: Array
+
+### Queries Syntaxes
+
+Legende:
+- fN: fieldName
+- v: Value
+- op: operator
+
+~~~js
+// Match by field name and it's exact value
+{\<fN1\> : \<v1\> , \<fN2\> : \<v2\>, ... }
+
+// Match by field name and operators
+{\<fN1\> : { {\<op\>:\<v1\>} , \<fN2\> : \<v2\>, ... }
+
+~~~
+
+
+:memo: Memo:
+- The double quotes around field names are optional.
+- The comma between key-value pairs in a query means `AND condition`.
+
+### Queries Examples
+
+Connect to the database `MyDB`
+~~~json
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+
+~~~
+
+~~~js
+var persons20YearsOld = db.getCollection("persons").find({age:  20});
+// var persons20YearsOld = db.persons.find({age: {$eq: 20}}); //equivalent query
+persons20YearsOld.count(); //46 persons
+
+var personsFemaleWithGreenEyes = db.getCollection("persons")
+                                    .find({gender: "female", eyeColor: "green"});
+personsFemaleWithGreenEyes.count(); //179 persons
+
+var personsOlderThan20YearsOld = db.getCollection("persons").find({age: {$gt: 20}}).count(); //954 persons
+~~~
+
+
+
+
   
                                
           
