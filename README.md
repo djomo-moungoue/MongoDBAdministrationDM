@@ -1365,6 +1365,349 @@ db.getCollection("Cursor").find().batchSize(30)
 Right click on the stream with the biggest length, Follow / TCP Stream. You can observe on the following picture that the MongoDB send 30 documents to the MongoDB client at a time:
 ![MongoDB Batch Size Inspection Using Wireshark](MongoDBBatchSizeInspectionUsingWireshark.JPG)
 
+## Query MongoDB
+
+You can generate random json objects to query in this website: [JSON GENERATOR](https://json-generator.com/).
+
+Query data set:
+- Path: ".\UdemyTutoDocs\persons.json"
+- Number of objects: 1000
+
+Obect property data types:
+- _id: ObjectId
+- index: Int32
+- name: String
+- isActive: Boolean
+- registered: Date
+- age: Int32
+- gender: String
+- eyeColor: String
+- favouriteFruit: String
+- comapany: Object
+    - title: String
+    - email: String
+    - phone: String
+    - location: Object
+        - country: String
+        - address: String
+- tags: Array
+
+### Query Syntaxes
+
+Legende:
+- fN: fieldName
+- v: Value
+- op: operator
+- i: index
+- c: condition
+- n: number
+
+~~~js
+// Match by field name and it's exact value
+{
+    \<fN1\> : \<v1\> , 
+    \<fN2\> : \<v2\>, 
+    ... 
+}
+
+// Match by field name and operators
+{
+    \<fN1\>: {\<op1\> : \<v1\>, \<op2\> : \<v2\>, ...}, 
+    \<fN3\> : \<v3\>,
+    ... 
+}
+
+//Comparison Operators
+$eq, $ne
+$gt, $lt, $gte, $lte
+
+// In operator
+$in, $nin // require an array as a value
+{
+    $in: [
+        {\<v1\>}
+        ,{\<v2\>}
+        ,...
+    ]
+}
+
+// And operator used to combine multiple conditions that must match all.
+{
+    $and: [
+        {\<c1\>}
+        ,{\<c2\>}
+        ,...
+    ]
+} // require an array as a value
+
+// Or operator used to combine multiple conditions that can match.
+{
+    $or: [
+        {\<c1\>}
+        ,{\<c2\>}
+        ,...
+    ]
+} // require an array as a value
+~~~
+
+
+:memo: Memo:
+- The double quotes around field names are optional.
+- You can use comparison operator with numbers, strings and date.
+- The `,` between key-value pairs in a query means `implicit AND` operator.
+- The `explicit AND` operator `$and` must be used if conditions contain same field or operator.  Else upcoming conditions could override forme ones.
+- It is recommended to use `$in` instead of `$or` if conditions contain same fields.  It is shorter and clearer.
+- Use the dot notation to query fields of nested documents, because the `.` is used in JavaScript to access the properties of an object.
+- Fields accessed with dot notaion `.` must be inside quotation marks.
+
+### Query Examples
+
+Connect to the database `MyDB`
+~~~js
+mongosh mongodb://root:root@localhost:27017
+
+use MyDB
+~~~
+
+~~~js
+var persons20YearsOld = db.getCollection("persons").find({age:  20});
+// var persons20YearsOld = db.persons.find({age: {$eq: 20}}); //equivalent query
+persons20YearsOld.count(); //46 persons
+
+var personsFemaleWithGreenEyes = db.getCollection("persons")
+                                    .find({gender: "female", eyeColor: "green"});
+personsFemaleWithGreenEyes.count(); //179 persons
+
+var personsOlderThan20YearsOld = db.getCollection("persons").find({age: {$gt: 20}}).count(); //954 persons
+
+var personsWithNotGreenEyeColor = db.getCollection("persons").find({eyeColor: {$ne: "green"}}).count(); //670 persons
+
+var personsBetween25And30YearsOld = db.getCollection("persons").find({age: {$gte: 25, $lte: 30}}).count(); //269 persons
+
+// Persons with name starting with at least n in alphabetical order = 284
+db.getCollection("persons").find({name: {$gte: "N"}}).count(); 
+
+// Persons with name starting with at least n in alphabetical order and sorted by name
+db.getCollection("persons").find({name: {$gte: "N"}}).sort({"name": 1}); 
+
+//Number of persons older than 27 and younger than 35. By assuming that person with age 27 are older than 27. = 353
+db.getCollection("persons").find({age: {$gte: 27, $lt: 35}}).count(); 
+
+//Persons older than 35 and having favorite fruit that is not banana = 191
+db.getCollection("persons").find(
+    {
+        age: {$gte: 35} 
+        ,favoriteFruit: {$ne: "banana"}
+    }
+).count();
+
+//Persons that are 21 or 22 years old = 116
+db.getCollection("persons").find(
+    {
+        age: {$in: [21, 22]}
+    }
+).count();
+
+//Persons that are not 21 and 22 years old = 884
+db.getCollection("persons").find(
+    {
+        age: {$nin: [21, 22]}
+    }
+).count();
+
+
+/*
+Persons with green or brown eyeColor and with strawberry as favoriteFruit
+*/
+db.getCollection("persons").find(
+    {
+        eyeColor: {$in: ["green", "brown"]}
+        ,favoriteFruit: "strawberry"
+    }
+).limit(11);
+
+// Exclude all persons that 25 years old, then retrieve all persons older than 20 years old. = 950
+db.getCollection("persons").find(
+    {
+        $and: [
+            {age: {$ne: 25}}
+            ,{age: {$gte: 20}}
+        ]
+    }
+).count();
+
+// Exclude all persons that 25 years old, then override that result set with persons older than 20 years old. = 1000
+db.getCollection("persons").find(
+    {
+        age: {$ne: 25}
+        ,age: {$gte: 20}
+    }
+).count();
+
+// Persons that 25 years old. = 50
+db.getCollection("persons").find(
+    {
+        age: {$eq: 25}
+    }
+).count();
+
+//Persons that are either active or have eyeColor blue = 677
+db.getCollection("persons").find(
+    {
+        $or: [
+            {isActive: true}
+            ,{eyeColor: "blue"}
+        ]
+    }
+).count(); 
+
+//Persons that have eyeColor either green or blue = 663
+db.getCollection("persons").find(
+    {
+        $or: [
+            {eyeColor: "green"}
+            ,{eyeColor: "blue"}
+        ]
+    }
+).count(); 
+
+//Persons that have eyeColor either green or blue = 663
+db.getCollection("persons").find(
+    {
+        eyeColor: 
+        {
+            $in: [
+                "green"
+                ,"blue"
+            ]
+        }
+    }
+).count(); 
+
+/*
+Persons younger than 24 or like bananas or color of eyes is either green or blue. = 738
+*/
+db.getCollection("persons").find(
+    {
+        $or: 
+        [
+            {age: {$lt: 24}}
+            ,{favoriteFruit: "bananas"}
+            ,{eyeColor: {$in: ["green", "blue"]}}
+        ]
+    }
+).count();
+
+/*
+Persons who are (older than 33 AND not 37 years old) OR live in Italy. Parentheses indicate precedence of the operations. 
+Expected = 460
+Obtained = 460
+*/
+db.getCollection("persons").find(
+    {
+        $or: [
+            {$and: 
+                [
+                    {age: {$gt: 33}}
+                    ,{age: {$ne: 37}}
+                ]
+            }
+            ,{"company.location.country": "Italy"}
+        ]
+    }
+).count();
+~~~
+
+### Array
+
+Query Syntaxes
+~~~js
+//Array contains certain value
+{\<fN\>: \<v\>}
+
+//Specific element in array has certain value
+{"\<fN\>.\<i\>": \<v\>}
+
+//Array contains all specified values independent of order
+{\<fN>: {"$all": [\<v1\> , \<v2\>, ...]}}
+
+//Array is of certain size, have a certain number of elements
+{\<fN\>: {"$size": \<n\>}}
+
+//At least one nested document in the Array must match ALL conditions. Order of conditions doesn't matter.
+{\<arrayField\> : {$elemMatch: {\<c1\>, \<c2\>, ...}}}
+~~~
+
+Query Examples
+~~~js
+/*
+Find all persons with second tag "ad" and where tags array consists of exactly 3 tags
+Expected: 2
+Obtained: 2
+*/
+db.getCollection("persons").find(
+    {
+        $and:
+        [
+            {"tags.1": "ad"}
+            ,{tags: {"$size": 3}}
+        ]
+    }
+).count();
+
+db.getCollection("first").find(
+    {
+        friends: {$elemMatch: {age: 23, name: "Lora"}}
+    }
+)
+~~~
+
+### Field Operators and Server Side Field Filtering
+
+Query Syntax
+~~~js
+// Check if a field exists inside a document
+{fieldName: {$exists: true/false}}
+
+// Check if a field inside a document has a given type. It helpful to update the type of certains fields existing in the document.
+{fieldName: {$type: TypeName}}
+{fieldName: {$type: TypeID}}
+
+// Filter a document fields to retrieve just a subset of it. This technique is also called projection because you project a large document to obtain a small one.
+{\<query>}
+,{
+    fieldName1: 1 //Send to the client
+    ,fieldName2: 0 //Filter out, or omit
+}
+~~~
+
+Practice
+~~~js
+/*
+Find all persons with blue eyes. Return only certain fields: name, age, gender, eyeColor and company
+Expected: 333
+Obtained: 333
+*/
+db.getCollection("persons").find(
+    {
+        eyeColor: "blue"
+    },
+    {
+        name: 1
+        ,age: 1
+        ,gender: 1
+        ,eyeColor: 1
+        ,company: 1
+    }
+).count();
+~~~
+
+### 
+
+
+
+
+
   
                                
           
