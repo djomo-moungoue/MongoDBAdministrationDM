@@ -1401,17 +1401,59 @@ Legende:
 
 ~~~js
 // Match by field name and it's exact value
-{\<fN1\> : \<v1\> , \<fN2\> : \<v2\>, ... }
+{
+    \<fN1\> : \<v1\> , 
+    \<fN2\> : \<v2\>, 
+    ... 
+}
 
 // Match by field name and operators
-{\<fN1\> : { {\<op\>:\<v1\>} , \<fN2\> : \<v2\>, ... }
+{
+    \<fN1\>: {\<op1\> : \<v1\>, \<op2\> : \<v2\>, ...}, 
+    \<fN3\> : \<v3\>,
+    ... 
+}
 
+//Comparison Operators
+$eq, $ne
+$gt, $lt, $gte, $lte
+
+// In operator
+$in, $nin // require an array as a value
+{
+    $in: [
+        {\<value1\>}
+        ,{\<value2\>}
+        ,...
+    ]
+}
+
+// And operator used to combine multiple conditions that must match all.
+{
+    $and: [
+        {\<condition1\>}
+        ,{\<condition2\>}
+        ,...
+    ]
+} // require an array as a value
+
+// Or operator used to combine multiple conditions that can match.
+{
+    $or: [
+        {\<condition1\>}
+        ,{\<condition2\>}
+        ,...
+    ]
+} // require an array as a value
 ~~~
 
 
 :memo: Memo:
 - The double quotes around field names are optional.
-- The comma between key-value pairs in a query means `AND condition`.
+- You can use comparison operator with numbers, strings and date.
+- The `,` between key-value pairs in a query means `implicit AND` operator.
+- The `explicit AND` operator `$and` must be used if conditions contain same field or operator.  Else upcoming conditions could override forme ones.
+- It is recommended to use `$in` instead of `$or` if conditions contain same fields.  It is shorter and clearer.
 
 ### Queries Examples
 
@@ -1433,6 +1475,124 @@ var personsFemaleWithGreenEyes = db.getCollection("persons")
 personsFemaleWithGreenEyes.count(); //179 persons
 
 var personsOlderThan20YearsOld = db.getCollection("persons").find({age: {$gt: 20}}).count(); //954 persons
+
+var personsWithNotGreenEyeColor = db.getCollection("persons").find({eyeColor: {$ne: "green"}}).count(); //670 persons
+
+var personsBetween25And30YearsOld = db.getCollection("persons").find({age: {$gte: 25, $lte: 30}}).count(); //269 persons
+
+// Persons with name starting with at least n in alphabetical order = 284
+db.getCollection("persons").find({name: {$gte: "N"}}).count(); 
+
+// Persons with name starting with at least n in alphabetical order and sorted by name
+db.getCollection("persons").find({name: {$gte: "N"}}).sort({"name": 1}); 
+
+//Number of persons older than 27 and younger than 35. By assuming that person with age 27 are older than 27. = 353
+db.getCollection("persons").find({age: {$gte: 27, $lt: 35}}).count(); 
+
+//Persons older than 35 and having favorite fruit that is not banana = 191
+db.getCollection("persons").find(
+    {
+        age: {$gte: 35} 
+        ,favoriteFruit: {$ne: "banana"}
+    }
+).count();
+
+//Persons that are 21 or 22 years old = 116
+db.getCollection("persons").find(
+    {
+        age: {$in: [21, 22]}
+    }
+).count();
+
+//Persons that are not 21 and 22 years old = 884
+db.getCollection("persons").find(
+    {
+        age: {$nin: [21, 22]}
+    }
+).count();
+
+
+/*
+Persons with green or brown eyeColor and with strawberry as favoriteFruit
+*/
+db.getCollection("persons").find(
+    {
+        eyeColor: {$in: ["green", "brown"]}
+        ,favoriteFruit: "strawberry"
+    }
+).limit(11);
+
+// Exclude all persons that 25 years old, then retrieve all persons older than 20 years old. = 950
+db.getCollection("persons").find(
+    {
+        $and: [
+            {age: {$ne: 25}}
+            ,{age: {$gte: 20}}
+        ]
+    }
+).count();
+
+// Exclude all persons that 25 years old, then override that result set with persons older than 20 years old. = 1000
+db.getCollection("persons").find(
+    {
+        age: {$ne: 25}
+        ,age: {$gte: 20}
+    }
+).count();
+
+// Persons that 25 years old. = 50
+db.getCollection("persons").find(
+    {
+        age: {$eq: 25}
+    }
+).count();
+
+//Persons that are either active or have eyeColor blue = 677
+db.getCollection("persons").find(
+    {
+        $or: [
+            {isActive: true}
+            ,{eyeColor: "blue"}
+        ]
+    }
+).count(); 
+
+//Persons that have eyeColor either green or blue = 663
+db.getCollection("persons").find(
+    {
+        $or: [
+            {eyeColor: "green"}
+            ,{eyeColor: "blue"}
+        ]
+    }
+).count(); 
+
+//Persons that have eyeColor either green or blue = 663
+db.getCollection("persons").find(
+    {
+        eyeColor: 
+        {
+            $in: [
+                "green"
+                ,"blue"
+            ]
+        }
+    }
+).count(); 
+
+/*
+Persons younger than 24 or like bananas or color of eyes is either green or blue. = 738
+*/
+db.getCollection("persons").find(
+    {
+        $or: 
+        [
+            {age: {$lt: 24}}
+            ,{favoriteFruit: "bananas"}
+            ,{eyeColor: {$in: ["green", "blue"]}}
+        ]
+    }
+).count();
 ~~~
 
 
