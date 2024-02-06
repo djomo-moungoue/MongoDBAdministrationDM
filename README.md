@@ -1392,12 +1392,15 @@ Obect property data types:
         - address: String
 - tags: Array
 
-### Queries Syntaxes
+### Query Syntaxes
 
 Legende:
 - fN: fieldName
 - v: Value
 - op: operator
+- i: index
+- c: condition
+- n: number
 
 ~~~js
 // Match by field name and it's exact value
@@ -1422,8 +1425,8 @@ $gt, $lt, $gte, $lte
 $in, $nin // require an array as a value
 {
     $in: [
-        {\<value1\>}
-        ,{\<value2\>}
+        {\<v1\>}
+        ,{\<v2\>}
         ,...
     ]
 }
@@ -1431,8 +1434,8 @@ $in, $nin // require an array as a value
 // And operator used to combine multiple conditions that must match all.
 {
     $and: [
-        {\<condition1\>}
-        ,{\<condition2\>}
+        {\<c1\>}
+        ,{\<c2\>}
         ,...
     ]
 } // require an array as a value
@@ -1440,8 +1443,8 @@ $in, $nin // require an array as a value
 // Or operator used to combine multiple conditions that can match.
 {
     $or: [
-        {\<condition1\>}
-        ,{\<condition2\>}
+        {\<c1\>}
+        ,{\<c2\>}
         ,...
     ]
 } // require an array as a value
@@ -1454,15 +1457,16 @@ $in, $nin // require an array as a value
 - The `,` between key-value pairs in a query means `implicit AND` operator.
 - The `explicit AND` operator `$and` must be used if conditions contain same field or operator.  Else upcoming conditions could override forme ones.
 - It is recommended to use `$in` instead of `$or` if conditions contain same fields.  It is shorter and clearer.
+- Use the dot notation to query fields of nested documents, because the `.` is used in JavaScript to access the properties of an object.
+- Fields accessed with dot notaion `.` must be inside quotation marks.
 
-### Queries Examples
+### Query Examples
 
 Connect to the database `MyDB`
-~~~json
+~~~js
 mongosh mongodb://root:root@localhost:27017
 
 use MyDB
-
 ~~~
 
 ~~~js
@@ -1593,7 +1597,113 @@ db.getCollection("persons").find(
         ]
     }
 ).count();
+
+/*
+Persons who are (older than 33 AND not 37 years old) OR live in Italy. Parentheses indicate precedence of the operations. 
+Expected = 460
+Obtained = 460
+*/
+db.getCollection("persons").find(
+    {
+        $or: [
+            {$and: 
+                [
+                    {age: {$gt: 33}}
+                    ,{age: {$ne: 37}}
+                ]
+            }
+            ,{"company.location.country": "Italy"}
+        ]
+    }
+).count();
 ~~~
+
+### Array
+
+Query Syntaxes
+~~~js
+//Array contains certain value
+{\<fN\>: \<v\>}
+
+//Specific element in array has certain value
+{"\<fN\>.\<i\>": \<v\>}
+
+//Array contains all specified values independent of order
+{\<fN>: {"$all": [\<v1\> , \<v2\>, ...]}}
+
+//Array is of certain size, have a certain number of elements
+{\<fN\>: {"$size": \<n\>}}
+
+//At least one nested document in the Array must match ALL conditions. Order of conditions doesn't matter.
+{\<arrayField\> : {$elemMatch: {\<c1\>, \<c2\>, ...}}}
+~~~
+
+Query Examples
+~~~js
+/*
+Find all persons with second tag "ad" and where tags array consists of exactly 3 tags
+Expected: 2
+Obtained: 2
+*/
+db.getCollection("persons").find(
+    {
+        $and:
+        [
+            {"tags.1": "ad"}
+            ,{tags: {"$size": 3}}
+        ]
+    }
+).count();
+
+db.getCollection("first").find(
+    {
+        friends: {$elemMatch: {age: 23, name: "Lora"}}
+    }
+)
+~~~
+
+### Field Operators and Server Side Field Filtering
+
+Query Syntax
+~~~js
+// Check if a field exists inside a document
+{fieldName: {$exists: true/false}}
+
+// Check if a field inside a document has a given type. It helpful to update the type of certains fields existing in the document.
+{fieldName: {$type: TypeName}}
+{fieldName: {$type: TypeID}}
+
+// Filter a document fields to retrieve just a subset of it. This technique is also called projection because you project a large document to obtain a small one.
+{\<query>}
+,{
+    fieldName1: 1 //Send to the client
+    ,fieldName2: 0 //Filter out, or omit
+}
+~~~
+
+Practice
+~~~js
+/*
+Find all persons with blue eyes. Return only certain fields: name, age, gender, eyeColor and company
+Expected: 333
+Obtained: 333
+*/
+db.getCollection("persons").find(
+    {
+        eyeColor: "blue"
+    },
+    {
+        name: 1
+        ,age: 1
+        ,gender: 1
+        ,eyeColor: 1
+        ,company: 1
+    }
+).count();
+~~~
+
+### 
+
 
 
 
