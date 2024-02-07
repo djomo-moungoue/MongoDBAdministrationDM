@@ -1933,9 +1933,36 @@ db.ShoppingCart.updateOne(
   upsertedCount: 0
 }
 */
+
+// Combine multiple update operators
+db.ShoppingCart.updateOne(
+    // query object
+    {index: 5}
+    //update object
+    ,{
+        $set: 
+        {
+            cartId: NumberInt(435)
+            ,"customer.name": "Samanta Larsen"
+            ,"customer.email": "slarsen@test.com"
+        }
+        ,$unset:
+        {
+            newOrder: 1
+        }
+    }
+);
+/*
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+*/
 ~~~
 
-### Combine multiple update operators
 
 
   
