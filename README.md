@@ -1459,6 +1459,7 @@ $in, $nin // require an array as a value
 - It is recommended to use `$in` instead of `$or` if conditions contain same fields.  It is shorter and clearer.
 - Use the dot notation to query fields of nested documents, because the `.` is used in JavaScript to access the properties of an object.
 - Fields accessed with dot notaion `.` must be inside quotation marks.
+- Regex require more memory, because it doesn't use indexes. So use it only when necessary.
 
 ### Query Examples
 
@@ -1702,12 +1703,536 @@ db.getCollection("persons").find(
 ).count();
 ~~~
 
-### 
+### REGEX Operator
+
+Syntax
+~~~js
+//Filter using Regular Expression
+{\<fieldName\>: {$regex: /pattern/\<options\>}}
+{\<fieldName\>: {$regex: "pattern"\<options\>}} //You can also use quotes instead of backslash
+{\<fieldName\>: {$regex: /pattern/, $options: "\<options\>"}}
+
+//Options
+i: Case insensitive to match upper and lower case.
+m: For patterns that include anchors (i.e. ^ for the start, $ for the end). If the pattern contains no anchors or if the string value has no newline characters (e.g. \\n), the m option has no effect.
+x: "Extended" capability to ignore all white space characters in the $regex pattern unless escaped or included in a character class.
+s: 
+~~~
+
+## Update documents
+
+Methods
+- update()
+- updateOne()
+- updateMany()
+- replaceOne()
+
+Operators
+- $set
+- $unset (alias $project)
+- $rename
+- $inc
+- $mul
+- $currentDate
+- $pop
+- $addToSet
+
+Create the collection ShoppingCard and fill it with documents
+~~~js
+
+use MyDB
+
+db.ShoppingCart.insertMany(
+    [
+        {index: NumberInt(1)}
+        ,{index: NumberInt(2)}
+        ,{index: NumberInt(3)}
+        ,{index: NumberInt(4)}
+        ,{index: NumberInt(5)}
+    ]
+);
+~~~
+
+Syntax
+~~~js
+//the parameters query and update are mandatory.
+db.\<collection\>.method(
+    \<query\>
+    ,\<update\>
+    ,\<options\>
+);
+
+/* Update the first matching document by default 
+upsert: true (update + insert) --> equivalent to updateOne()
+- Creates a new document if no documents match the query. 
+- Updates a single document that matches the query.
+multi: true --> equivalent to updateMulti()
+- updates multiple documents that meet the query criteria
+*/
+db.\<collection\>.update(
+    \<query\>
+    ,\<update\>
+    ,\<options\>
+);
+
+/*
+Possible outputs
+
+//One document found and successfully updated
+WriteResult(
+    {
+        "nMatched": 1, 
+        "nUpserted": 0,
+        "nModified": 1
+    }
+)
+
+//One document found and but not updated because existing and new value match. No update required.
+WriteResult(
+    {
+        "nMatched": 1, 
+        "nUpserted": 0,
+        "nModified": 0
+    }
+)
+
+//No matching document.
+WriteResult(
+    {
+        "nMatched": 0, 
+        "nUpserted": 0,
+        "nModified": 0
+    }
+)
+*/
+
+//Replace or set value of document fields
+{
+    $set: 
+    {
+         \<fN1\>: \<v1\>
+        ,\<fN2\>: \<v2\>
+        ,...
+    }
+}
+
+// Remove certain fields from documents. When you have added them by mistake for example
+{
+    $unset:
+    {
+        \<fN1\>: \<anyValue\>
+        ,...
+    }
+}
+
+// Replace the content one document by the content of another. Memo: `_id` remains unchanged
+db.\<collection\>.replaceOne(
+    \<query\>
+    ,\<replacement\>
+    ,\<options\>
+)
+~~~
+
+Examples
+~~~js
+//Update the shopping cart number 2 by adding a cartId and a customer object having a name, email and age
+db.getCollection("ShoppingCart").updateOne(
+    // query object
+    {index: 2}
+    // update object
+    ,{$set:
+        {            
+            cartId: NumberInt(325)
+            ,customer:
+            {
+                name: "Mike Foster"
+                ,email: "mforster@test.com"
+                ,age: NumberInt(27)
+            }
+            ,cart: []
+        }
+    }
+    // options objects
+);
 
 
+//Update the shopping cart number 1 by adding a cartId and a customer object having a name, email and age
+db.getCollection("ShoppingCart").updateOne(
+    // query object
+    {index: 1}
+    // update object
+    ,{$set:
+        {            
+            cartId: NumberInt(325)
+            ,customer:
+            {
+                name: "Mike Foster"
+                ,email: "mforster@test.com"
+                ,age: NumberInt(27)
+            }
+            ,cart: []
+        }
+    }
+    // options objects
+);
+
+// Remove and modify some fields of the document 1
+db.getCollection("ShoppingCart").updateOne(
+    // query object
+    {index: 1}
+    // update object
+    ,{$set:
+        {            
+            cartId: NumberInt(1)
+            ,cart: ""
+        }
+    }
+    // options objects
+);
+
+// Replace the content one document by the content of another. Memo: `_id` remains unchanged
+db.ShoppingCart.replaceOne(
+    // query object
+    {index: 3}
+    //replacement object
+    ,{
+        index: 3
+        ,processed: true
+        ,cart: ["item1", "item2"]
+    }
+);
+/*
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+*/
+
+db.ShoppingCart.updateOne(
+    // query object
+    {index: 4}
+    //update object
+    ,{
+        $set: 
+        {
+            index: 4
+            ,processed: true
+            ,cart: ["item1", "item2"]
+        }
+    }
+);
+/*
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+*/
+
+// Combine multiple update operators
+db.ShoppingCart.updateOne(
+    // query object
+    {index: 5}
+    //update object
+    ,{
+        $set: 
+        {
+            cartId: NumberInt(435)
+            ,"customer.name": "Samanta Larsen"
+            ,"customer.email": "slarsen@test.com"
+        }
+        ,$unset:
+        {
+            newOrder: 1
+        }
+    }
+);
+/*
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+*/
+~~~
+
+### Update Operators
+
+:memo: Memo:
+- During the update operation, if a field doesn't exist, nothing happens.
+- Renamed fields will be append at the of document fields.
+
+Syntax
+~~~js
+// Rename a field
+{
+    $rename: 
+    {
+        \<fN1\>: \<newFN1\>, 
+        ...
+    }
+}
+
+// Get the current system tiemstamp
+//1. Method: Set the value of the field to the current date
+{
+    $currentDate: 
+    {
+        \<fN1\>: true
+        ,...
+    }
+}
+
+//2. Method: Set the value of the field to the current date
+{
+    $set: 
+    {
+        \<fN1\>: ISODate()
+//      \<fN1\>: new Date()
+    }
+}
+~~~
+
+Examples
+~~~js
+db.ShoppingCart.find(
+    {cartId: {$exists: true}}
+).count(); //3
+
+// Rename cartId with orderId in all matching documents
+db.ShoppingCart.updateMany(
+    {
+//        cartId: {$exists: true}
+        orderId: {$exists: true}
+    }
+    ,{
+        $rename: 
+        {
+ //           cartId: "orderId"
+            orderId: "cartId"
+        }
+    }
+);
+
+db.ShoppingCart.find(
+    {orderId: {$exists: true}}
+).count(); //3
+
+//Set the createAt field of the document with the cartId 325 to the current field
+db.ShoppingCart.find(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+).count();
+
+db.ShoppingCart.updateMany(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+    ,{
+        $set: 
+        {
+            createAt: ISODate()
+//          createAt: new Date()
+        }
+    }
+);
+
+db.ShoppingCart.updateMany(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+    ,{
+        $currentDate: 
+        {
+            createAt: true
+        }
+    }
+);
+
+// add the updateAt to all documents if it doesn't exist and set it to the current timestamp
+db.ShoppingCart.updateMany(
+    {
+        updateAt: {$exists: false}
+    }
+    ,{
+        $set: 
+        {
+            updateAt: ISODate()
+        }
+    }
+);
+~~~
+
+### Array Update Operators
+
+:memo: Memo:
+- `Modifier operators` such as $each, $sort perform pre-processing operations.
+- `$each` is a modifier used inside `$push` and `$addToSet` operators.
+
+- $
+- $push
+- $pull
+- $pullAll
+- $pop
+- $addToSet
+
+Syntaxes
+~~~js
+// Appends element to the array without checking if it exists or not. Create an array if it doesn't exist
+{
+    $push:
+    {
+        \<arrayFieldName\>: \<element\>
+    }
+}
+
+// Appends element to the array if it doesn't exist. Create an array if it doesn't exist.
+// Saver variant ot $push
+{
+    $addToSet:
+    {
+        \<arrayFieldName\>: \<element\>
+    }
+}
+
+// Delete element the first (-1) or last (1) element of an array. As if it was a queue.
+// It remains an empty array after deleting the last element. 
+{
+    $pop:
+    {
+        \<arrayFieldName\>: \<-1 | 1\>
+    }
+}
+
+// Removes all elements in the Array matching specific element or condition
+{
+    $pull:
+    {
+        \<arrayFieldName\>: \element | condition\>
+    }
+}
+
+// Removes all elements in the Array matching values mentioned int the list
+{
+    $pullAll:
+    {
+        \<arrayFieldName\>: 
+        [
+            <\value1\>
+            ,<\value2\>
+            ,...
+        ]
+    }
+}
+
+// Equivalent to
+{
+    $pull:
+    {
+        \<arrayFieldName\>: 
+        {
+            $in: 
+            [
+                <\value1\>
+                ,<\value2\>
+                ,...
+            ]
+        }
+    }
+}
+~~~
+
+Examples
+~~~js
+//Add one element named item1 to cart array having the cardId 325
+db.ShoppingCart.updateOne(
+    {cartId: 325},
+    {
+        $push: 
+        {
+            cart: "item1"
+        }
+    }
+);
+
+//Add many elements named item2 and item3 to cart array having the cardId 325
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $push: 
+        {
+            cart: 
+            {
+                $each: 
+                [
+                    "item2"
+                    ,"item3"
+                ]
+            }
+        }
+    }
+);
+
+// Experiment the $pull operator
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $addToSet: 
+        {
+            spentAmount: 
+            {
+                $each: 
+                [
+                    NumberInt(400)
+                    ,NumberInt(700)
+                    ,NumberInt(200)
+                    ,NumberInt(800)
+                    ,NumberInt(500)
+                ]
+            }
+        }
+    }
+);
+
+// Delete spent amount 200
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $pull: 
+        {
+            spentAmount: 200
+        }
+    }
+);
+
+// Delete spent amount greater than 400
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $pull: 
+        {
+            spentAmount: 
+            {
+                $gt: 400
+
+            }
+        }
+    }
+);
 
 
-
+~~~
   
                                
           
