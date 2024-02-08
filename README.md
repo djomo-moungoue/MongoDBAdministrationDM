@@ -1963,8 +1963,151 @@ db.ShoppingCart.updateOne(
 */
 ~~~
 
+### Update Operators
+
+:memo: Memo:
+- During the update operation, if a field doesn't exist, nothing happens.
+- Renamed fields will be append at the of document fields.
+
+Syntax
+~~~js
+// Rename a field
+{
+    $rename: 
+    {
+        \<fN1\>: \<newFN1\>, 
+        ...
+    }
+}
+
+// Get the current system tiemstamp
+//1. Method: Set the value of the field to the current date
+{
+    $currentDate: 
+    {
+        \<fN1\>: true
+        ,...
+    }
+}
+
+//2. Method: Set the value of the field to the current date
+{
+    $set: 
+    {
+        \<fN1\>: ISODate()
+//      \<fN1\>: new Date()
+    }
+}
+~~~
+
+Examples
+~~~js
+db.ShoppingCart.find(
+    {cartId: {$exists: true}}
+).count(); //3
+
+// Rename cartId with orderId in all matching documents
+db.ShoppingCart.updateMany(
+    {
+//        cartId: {$exists: true}
+        orderId: {$exists: true}
+    }
+    ,{
+        $rename: 
+        {
+ //           cartId: "orderId"
+            orderId: "cartId"
+        }
+    }
+);
+
+db.ShoppingCart.find(
+    {orderId: {$exists: true}}
+).count(); //3
+
+//Set the createAt field of the document with the cartId 325 to the current field
+db.ShoppingCart.find(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+).count();
+
+db.ShoppingCart.updateMany(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+    ,{
+        $set: 
+        {
+            createAt: ISODate()
+//          createAt: new Date()
+        }
+    }
+);
+
+db.ShoppingCart.updateMany(
+    {
+        createAt: {$exists: false}
+        ,cartId: 325
+    }
+    ,{
+        $currentDate: 
+        {
+            createAt: true
+        }
+    }
+);
+
+// add the updateAt to all documents if it doesn't exist and set it to the current timestamp
+db.ShoppingCart.updateMany(
+    {
+        updateAt: {$exists: false}
+    }
+    ,{
+        $set: 
+        {
+            updateAt: ISODate()
+        }
+    }
+);
+~~~
+
+### Array Update Operators
+
+- $
+- $push
+- $pull
+- $pullAll
+- $pop
+- $addToSet
+
+Syntaxes
+~~~js
+// Appends element to the array. Create an array if it doesn't exist
+{
+    $push:
+    {
+        \<arrayFieldName\>: <element>
+    }
+}
 
 
+~~~
+
+Examples
+~~~js
+//Add item1 to cart array having the cardId 325
+db.ShoppingCart.updateOne(
+    {cartId: 325},
+    {
+        $push: {
+            cart: "item1"
+        }
+    }
+);
+~~~
   
                                
           
