@@ -2076,6 +2076,10 @@ db.ShoppingCart.updateMany(
 
 ### Array Update Operators
 
+:memo: Memo:
+- `Modifier operators` such as $each, $sort perform pre-processing operations.
+- `$each` is a modifier used inside `$push` and `$addToSet` operators.
+
 - $
 - $push
 - $pull
@@ -2085,28 +2089,149 @@ db.ShoppingCart.updateMany(
 
 Syntaxes
 ~~~js
-// Appends element to the array. Create an array if it doesn't exist
+// Appends element to the array without checking if it exists or not. Create an array if it doesn't exist
 {
     $push:
     {
-        \<arrayFieldName\>: <element>
+        \<arrayFieldName\>: \<element\>
     }
 }
 
+// Appends element to the array if it doesn't exist. Create an array if it doesn't exist.
+// Saver variant ot $push
+{
+    $addToSet:
+    {
+        \<arrayFieldName\>: \<element\>
+    }
+}
 
+// Delete element the first (-1) or last (1) element of an array. As if it was a queue.
+// It remains an empty array after deleting the last element. 
+{
+    $pop:
+    {
+        \<arrayFieldName\>: \<-1 | 1\>
+    }
+}
+
+// Removes all elements in the Array matching specific element or condition
+{
+    $pull:
+    {
+        \<arrayFieldName\>: \element | condition\>
+    }
+}
+
+// Removes all elements in the Array matching values mentioned int the list
+{
+    $pullAll:
+    {
+        \<arrayFieldName\>: 
+        [
+            <\value1\>
+            ,<\value2\>
+            ,...
+        ]
+    }
+}
+
+// Equivalent to
+{
+    $pull:
+    {
+        \<arrayFieldName\>: 
+        {
+            $in: 
+            [
+                <\value1\>
+                ,<\value2\>
+                ,...
+            ]
+        }
+    }
+}
 ~~~
 
 Examples
 ~~~js
-//Add item1 to cart array having the cardId 325
+//Add one element named item1 to cart array having the cardId 325
 db.ShoppingCart.updateOne(
     {cartId: 325},
     {
-        $push: {
+        $push: 
+        {
             cart: "item1"
         }
     }
 );
+
+//Add many elements named item2 and item3 to cart array having the cardId 325
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $push: 
+        {
+            cart: 
+            {
+                $each: 
+                [
+                    "item2"
+                    ,"item3"
+                ]
+            }
+        }
+    }
+);
+
+// Experiment the $pull operator
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $addToSet: 
+        {
+            spentAmount: 
+            {
+                $each: 
+                [
+                    NumberInt(400)
+                    ,NumberInt(700)
+                    ,NumberInt(200)
+                    ,NumberInt(800)
+                    ,NumberInt(500)
+                ]
+            }
+        }
+    }
+);
+
+// Delete spent amount 200
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $pull: 
+        {
+            spentAmount: 200
+        }
+    }
+);
+
+// Delete spent amount greater than 400
+db.ShoppingCart.updateMany(
+    {cartId: 325},
+    {
+        $pull: 
+        {
+            spentAmount: 
+            {
+                $gt: 400
+
+            }
+        }
+    }
+);
+
+
 ~~~
   
                                
