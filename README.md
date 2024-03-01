@@ -2123,7 +2123,7 @@ Syntaxes
     }
 }
 
-// Removes all elements in the Array matching values mentioned int the list
+// Removes all elements in the Array matching values mentioned int the list: No use condition possible 
 {
     $pullAll:
     {
@@ -2230,8 +2230,6 @@ db.ShoppingCart.updateMany(
         }
     }
 );
-
-
 ~~~
   
                                
