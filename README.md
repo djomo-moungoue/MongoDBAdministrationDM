@@ -2123,7 +2123,7 @@ Syntaxes
     }
 }
 
-// Removes all elements in the Array matching values mentioned int the list
+// Removes all elements in the Array matching values mentioned int the list: No use condition possible 
 {
     $pullAll:
     {
@@ -2230,10 +2230,242 @@ db.ShoppingCart.updateMany(
         }
     }
 );
-
-
 ~~~
   
-                               
-          
-                                   
+
+# Positional Operator $
+
+The dollar sign operator points to certains elements in the array that matched the query. It is mustly used in conjonction with other operators. The dollar sign represents a dynamic index of elements in the array.
+
+Syntax
+~~~js
+{
+    $set: // or $unset
+    {
+        \<arrayField.$\>: \<value\>
+    } 
+}
+{
+    $set: // or $unset
+    {
+        \<arrayField.$.field\>: \<value\>
+    }    
+}
+~~~
+
+Examples
+~~~js
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 435
+    },
+    //update
+    {
+        $push: {
+            cart: {$each: ["item1", "item2", "item3", "item4"]}
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+//Update the value of the item2 of the cart array
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 435, cart: "item2"
+    },
+    //update
+    {
+        $set: {
+            "cart.$": "updatedItem2"
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+db.ShoppingCart.find({cartId: 435})
+
+//Delete the value of the item3 of the cart array
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 435, cart: "item3"
+    },
+    //update
+    {
+        $unset: {
+            "cart.$": 1
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+db.ShoppingCart.find({cartId: 435})
+
+//Remove item3 from the cart array
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 435
+    },
+    //update
+    {
+        $pull: {
+            cart: null
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+db.ShoppingCart.find({cartId: 435})
+
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        index: 5
+    },
+    //update
+    {
+        $set: {
+            cartId: NumberInt(456)
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+db.ShoppingCart.updateOne(
+    {
+        cartId: 456
+    },
+    {
+        $push: 
+        {
+            cart: 
+            {
+                $each: 
+                [
+                    {"title": "TV"},
+                    {"title": "Phone"}
+                ]
+            }
+        }
+    }
+)
+
+//Update specific nested document in the array
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 456, "cart.title": "updatedTV"
+    },
+    //update
+    {
+        $set: {
+            "cart.$.title": "TV"
+            ,"cart.$.price": NumberInt(340)
+            ,"cart.$.quantity": NumberInt(2)
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+//Update specific nested document in the array
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 456, "cart.title": "Phone"
+    },
+    //update
+    {
+        $set: {
+            "cart.$.price": NumberInt(150)
+            ,"cart.$.quantity": NumberInt(1)
+        }
+    },
+    // update options (Optional)
+    {}
+)
+
+//Update specific nested document in the array by filtering whit more than one array fields
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cart: {$elemMatch: {title: "Phone", price: 150}}
+    },
+    //update
+    {
+        $set: {
+            "cart.$.quantity": NumberInt(2)
+        }
+    },
+    // update options (Optional)
+    {}
+)
+~~~
+
+
+The $inc operator
+
+Syntax
+~~~js
+It increments value by specified amount
+{
+    {
+        \<fieldName1\>: \<amount\>,
+        ...
+    }
+}
+~~~
+
+Example
+~~~js
+//Increment the quantity by 3
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cart: {$elemMatch: {title: "Phone", price: 150}}
+    },
+    //update
+    {
+        $inc: {"cart.$.quantity": NumberInt(3)}
+    },
+    // update options (Optional)
+    {}
+)
+
+//Delete the field: quantity: 5
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cartId: 456
+    },
+    //update
+    {
+        $unset: {"quantity": NumberInt(5)}
+    },
+    // update options (Optional)
+    {}
+)
+
+//Decrement the quantity by 2
+db.getCollection('ShoppingCart').updateOne(
+    // query
+    {
+        cart: {$elemMatch: {title: "Phone", price: 150}}
+    },
+    //update
+    {
+        $inc: {"cart.$.quantity": NumberInt(-2)}
+    },
+    // update options (Optional)
+    {}
+)
+~~~
+                                            
