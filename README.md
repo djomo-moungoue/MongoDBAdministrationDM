@@ -2232,6 +2232,26 @@ db.ShoppingCart.updateMany(
 );
 ~~~
   
+
+# Positional Operator $
+
+The sollar sign operator points to certain element in the array that matched the query. It is mustly used in conjonction with other operators. The dollar sign represents the index of elements in the array.
+
+Syntax
+~~~js
+{
+    $set: // or $unset
+    {
+        \<arrayField.$\>: \<value\>
+    } 
+}
+{
+    $set: // or $unset
+    {
+        \<arrayField.$.field\>: \<value\>
+    }    
+}
+~~~
                                
           
                                    
