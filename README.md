@@ -2469,3 +2469,53 @@ db.getCollection('ShoppingCart').updateOne(
 )
 ~~~
                                             
+# Delete Operations
+
+Create a temp collection to experiment delete operations on.
+~~~js
+db.TempCollection.insertMany(
+    [{},{},{},{},{}]
+)
+~~~
+
+## Document delete operations
+
+~~~js
+// remove(): Removes all documents that matches the query
+db.\<collection\>.remove(\<query\>)
+db.\<collection\>.remove(\<query\>, true) //true tells MongoDB that just one document should be deleted
+
+// deleteOne(): Removes one document that matches query
+db.\<collection\>.deleteOne(\<query\>)
+
+
+// deleteMany(): Remove all documents
+db.\<collection\>.deleteMany(\<query\>)
+~~~
+
+CAUTION:
+- remove({}): will delete all documents in the collection
+- deleteMany({}): will delete all documents in the collection
+- remove({}, true): will delete the first document in the collection
+- deleteOne({}): will delete the first document in the collection
+
+Examples
+~~~js
+db.TempCollection.remove
+(
+    {
+        '_id': ObjectId('65ef53d63a7ff4e8f03a2ddf')
+    }
+    , true
+)
+~~~
+
+Syntax
+~~~js
+// drop(): deletes collection with all documents and indexes
+db.\<collection\>.drop()
+
+//dropDatabase(): delete database with all collections and documents
+use \<databaseName\>
+db.dropDatabase()
+~~~
