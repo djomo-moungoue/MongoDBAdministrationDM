@@ -2523,8 +2523,11 @@ The aggregation process looks like a pipe which consists of subset of documents 
 - Match uses standard MongoDB queries and supports all query operators.
 - Find with a query is equivalent to aggregate with one stage operator.
 - In the $group stage, keeps in mind that the number of field grouped by increase the number of possible combinations in the output set.
-- Note that grouping before matching requires more ressources. In this case, group field must look like: "_id.\<fieldName\>"
+- Note that the match stage must be always added before the group stage, because grouping before matching requires more ressources. In this case, group field must look like: "_id.\<fieldName\>"
 - db.\<collection\>.find().count() is a wrapper of db.\<collection\>.aggregate([{$count: "total"}]). These 2 methods are the most effective because they are performed on the server side.
+- The sort stage is usually put after the match and group stages.
+- The project stage is usually after the match stage. It can be used to restructure documents by renaming existing fields and adding new fields.
+- `$limit` is usually used in sampled aggregation requests with $limit as first stage; after $sort to produce topN results
 
 
 
@@ -2674,7 +2677,7 @@ db.persons.aggregate([
 ])
 ~~~
 
-`$count` (05/08): counts the number of objects or documents. Counts the number of the input documents.
+`$count` (03/08): counts the number of objects or documents. Counts the number of the input documents.
 ~~~js
 //Syntax
 {
@@ -2702,20 +2705,150 @@ db.persons.aggregate([]).itcount()
 db.persons.aggregate([]).toArray().length
 ~~~
 
+`$sort` (04/08): sorts objects. It is usually put after the match and group stages.
+~~~js
+//Syntax
+{
+    $sort:
+    {
+        \<field1\>: \<-1 | 1\> //descending or ascending order
+        ,\<field2\>: \<-1 | 1\>
+    }
+}
 
-`$project` (03/08): filters fields in the documents.
+//Examples
+{
+    $sort: {score: -1}
+    $sort: {age: 1, country: 1}
+}
+~~~
 
 
-`$sort` (04/08): sorts objects.
+`$project` (05/08): filters fields in the documents. It is similar to the field filtering in the find method. Includes, excludes or adds new field(s).
+~~~js
+//Syntax
+{
+    $project: 
+    {
+        \<field1\>: \<0 | 1 | expression\> //exclude or include the field in the output set
+        ,\<field2\>: \<0 | 1 | expression\>        
+        ,\<newField1\>: \<expression\>        
+    }
+}
+
+//Examples
+db.persons.aggregate
+([
+    {
+        $project: 
+        {
+            _id: 0
+            name: 1
+            ,"company.title": 1
+            ,age: 1
+        }
+    }
+])
+
+db.persons.aggregate
+([   
+    {
+        $project: 
+        {
+            name: 1
+            ,"company.title": 1
+            ,age: 1
+            ,newAge: "$age"
+        }
+    }
+])
+
+db.persons.aggregate
+([   
+    {
+        $project: 
+        {
+            _id: 0
+            ,name: 1
+            ,info:
+            {
+                eyes: "$eyeColor"
+                ,fruit: "$favoriteFruit"
+                ,country: "$company.location.country"
+            }
+        }
+    }
+])
+
+~~~
 
 
+`$limit` (06/08): limits the number of documents. Similar to the limit operator of the find method. Outputs first N documents from the input.
+~~~js
+//Syntax
+{
+    $limit: \<number\>
+}
 
+//Example
+{
+    $limit: 100
+}
 
-`$limit` (06/08): limits the number of documents.
+//Filter the first 100 persons of the input set older that 27 and group the by country 
+db.persons.aggregate([
+    {$limit: 100}
+    ,{$match: {age: {$gt: 27}}}
+    ,{$group: {_id: "$company.location.country"}}
+])
+~~~
+
+`$unwind` (07/08): Splits each document with specified array to several documents - one document per array element.
+~~~js
+//Syntax
+{
+    $unwind: \<arrayReferenceExpression\>
+}
+
+Illustration
+- Input: Document1 { ... tags: ["first", "second", "third"] ...}
+- $unwind: "$tags"
+- Output: Document1 { ... tags: "first" ...}, Document2 { ... tags: "second" ...}, Document3 { ... tags: "third" ...}
+
+//Examples
+{$unwind: "$tags"}
+{$unwind: "$hobbies"}
+
+//$unwind combined with $project
+db.persons.aggregate([
+    {$unwind: "$tags"}
+    ,{$project: {name: 1, gender: 1, tags: 1}}
+])
+
+//$unwind combined with $group
+db.persons.aggregate([
+    {$unwind: "$tags"}
+    ,{$group: {_id: "$tags"}}
+])
+~~~
 
 
 `$skip` (07/08): skips a certain amount of documents.
 
 
 `$out` (08/08): writes the result of the aggregation into another collection.
+
+
+`$sum` (01/02):
+
+
+`$avg` (02/02):
+
+`allowDiskTrue: true` is an option that can be used to ask MongoDB to write stages data to the temporal files instead of RAM, because:
+- all aggregation stages can use maximum 100 MB of RAM
+- the server will return error if RAM limit is exceeded
+- Usage: db.persons.aggregate([], {allowDiskUse: true})
+
+
+
 
