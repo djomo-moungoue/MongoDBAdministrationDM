@@ -2517,11 +2517,16 @@ The aggregation process looks like a pipe which consists of subset of documents 
 
 :memo: Memo: 
 - Aggregation request returns cursor from the server.
-- db.\<collection\>.aggregate([]] is equivalent to db.\<collection\>.find({})
+- db.\<collection\>.aggregate([]) is equivalent to db.\<collection\>.find({})
 - Aggregation stages are independent.
 - an aggregation expression refers to the name of the field in input documents `"$\<fieldName\>"`. Use the dot notation to reference a nested field.
 - Match uses standard MongoDB queries and supports all query operators.
 - Find with a query is equivalent to aggregate with one stage operator.
+- In the $group stage, keeps in mind that the number of field grouped by increase the number of possible combinations in the output set.
+- Note that grouping before matching requires more ressources. In this case, group field must look like: "_id.\<fieldName\>"
+- db.\<collection\>.find().count() is a wrapper of db.\<collection\>.aggregate([{$count: "total"}]). These 2 methods are the most effective because they are performed on the server side.
+
+
 
 Load the persons.json collection
 ~~~js
@@ -2622,7 +2627,80 @@ db.persons.aggregate(
 )
 ~~~
 
-`$group` (02/08): groups documents by certain criteria.
+`$group` (02/08): groups documents by certain criteria. Groups input documents by certain expressions
+~~~js
+//Memo: _id is a mandatory field while others are optionals
+//Syntax
+{
+    $group:
+    {
+        _id: \<expression\>
+        ,\<field\>: {\<accumulator1\> : \<expression1\>}
+        , ...
+    }
+}
+
+//Examples
+// Group the output set by distinct age
+db.persons.aggregate([
+    {
+        $group: {
+            _id: "$age"
+        }
+    }
+])
+
+// Group the output set by age and gender
+db.persons.aggregate([
+    {
+        $group: {
+            _id: {age: "$age", gender: "$gender"}
+        }
+    }
+])
+
+//Matches documents by gender female and groups them by eyeColor and age
+db.persons.aggregate([
+    {//stage
+        $match: {
+            gender: "female"
+        }
+    }
+    ,{//stage 2
+        $group: {
+            _id: {age: "$age", eyeColor: "$eyeColor"}
+        }
+    }
+])
+~~~
+
+`$count` (05/08): counts the number of objects or documents. Counts the number of the input documents.
+~~~js
+//Syntax
+{
+    $count: "<title>"
+}
+
+//Example
+{
+    $count: "countries"
+}
+~~~
+
+Different count methods
+~~~js
+//Server-side count. 0.21 sec for 1000 documents
+db.persons.aggregate([{$count: "total"}])
+
+//Server-side count. 0.21 sec for 1000 documents.
+db.persons.find({}).count()
+
+//Client-side count. count all documents in the cursor. 1.4 sec for 1000 documents
+db.persons.aggregate([]).itcount()
+
+//Client-side count. convert the cursor returned to an array and count the number of documents in the array. 1,7 sec for 1000 documents
+db.persons.aggregate([]).toArray().length
+~~~
 
 
 `$project` (03/08): filters fields in the documents.
@@ -2631,7 +2709,6 @@ db.persons.aggregate(
 `$sort` (04/08): sorts objects.
 
 
-`$count` (05/08): counts the number of objects or documents.
 
 
 `$limit` (06/08): limits the number of documents.
