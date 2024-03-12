@@ -1394,26 +1394,18 @@ Obect property data types:
 
 ### Query Syntaxes
 
-Legende:
-- fN: fieldName
-- v: Value
-- op: operator
-- i: index
-- c: condition
-- n: number
-
 ~~~js
 // Match by field name and it's exact value
 {
-    \<fN1\> : \<v1\> , 
-    \<fN2\> : \<v2\>, 
+    \<fieldName1\> : \<value1\> , 
+    \<fieldName2\> : \<value2\>, 
     ... 
 }
 
 // Match by field name and operators
 {
-    \<fN1\>: {\<op1\> : \<v1\>, \<op2\> : \<v2\>, ...}, 
-    \<fN3\> : \<v3\>,
+    \<fieldName1\>: {\<operator1\> : \<value1\>, \<operator2\> : \<value2\>, ...}, 
+    \<fieldName3\> : \<value3\>,
     ... 
 }
 
@@ -1425,8 +1417,8 @@ $gt, $lt, $gte, $lte
 $in, $nin // require an array as a value
 {
     $in: [
-        {\<v1\>}
-        ,{\<v2\>}
+        {\<value1\>}
+        ,{\<value2\>}
         ,...
     ]
 }
@@ -1434,8 +1426,8 @@ $in, $nin // require an array as a value
 // And operator used to combine multiple conditions that must match all.
 {
     $and: [
-        {\<c1\>}
-        ,{\<c2\>}
+        {\<condition1\>}
+        ,{\<condition2\>}
         ,...
     ]
 } // require an array as a value
@@ -1443,8 +1435,8 @@ $in, $nin // require an array as a value
 // Or operator used to combine multiple conditions that can match.
 {
     $or: [
-        {\<c1\>}
-        ,{\<c2\>}
+        {\<condition1\>}
+        ,{\<condition2\>}
         ,...
     ]
 } // require an array as a value
@@ -1624,19 +1616,19 @@ db.getCollection("persons").find(
 Query Syntaxes
 ~~~js
 //Array contains certain value
-{\<fN\>: \<v\>}
+{\<fieldName\>: \<value\>}
 
 //Specific element in array has certain value
-{"\<fN\>.\<i\>": \<v\>}
+{"\<fieldName\>.\<index\>": \<value\>}
 
 //Array contains all specified values independent of order
-{\<fN>: {"$all": [\<v1\> , \<v2\>, ...]}}
+{\<fieldName>: {"$all": [\<value1\> , \<value2\>, ...]}}
 
 //Array is of certain size, have a certain number of elements
-{\<fN\>: {"$size": \<n\>}}
+{\<fieldName\>: {"$size": \<number\>}}
 
 //At least one nested document in the Array must match ALL conditions. Order of conditions doesn't matter.
-{\<arrayField\> : {$elemMatch: {\<c1\>, \<c2\>, ...}}}
+{\<arrayField\> : {$elemMatch: {\<condition1\>, \<condition2\>, ...}}}
 ~~~
 
 Query Examples
@@ -1810,8 +1802,8 @@ WriteResult(
 {
     $set: 
     {
-         \<fN1\>: \<v1\>
-        ,\<fN2\>: \<v2\>
+         \<fieldName1\>: \<value1\>
+        ,\<fieldName2\>: \<value2\>
         ,...
     }
 }
@@ -1820,7 +1812,7 @@ WriteResult(
 {
     $unset:
     {
-        \<fN1\>: \<anyValue\>
+        \<fieldName1\>: \<anyValue\>
         ,...
     }
 }
@@ -1975,7 +1967,7 @@ Syntax
 {
     $rename: 
     {
-        \<fN1\>: \<newFN1\>, 
+        \<fieldName1\>: \<newfieldName1\>, 
         ...
     }
 }
@@ -1985,7 +1977,7 @@ Syntax
 {
     $currentDate: 
     {
-        \<fN1\>: true
+        \<fieldName1\>: true
         ,...
     }
 }
@@ -1994,8 +1986,8 @@ Syntax
 {
     $set: 
     {
-        \<fN1\>: ISODate()
-//      \<fN1\>: new Date()
+        \<fieldName1\>: ISODate()
+//      \<fieldName1\>: new Date()
     }
 }
 ~~~
@@ -2519,3 +2511,134 @@ db.\<collection\>.drop()
 use \<databaseName\>
 db.dropDatabase()
 ~~~
+
+# Aggregation Framework
+The aggregation process looks like a pipe which consists of subset of documents that match certain conditions.
+
+:memo: Memo: 
+- Aggregation request returns cursor from the server.
+- db.\<collection\>.aggregate([]] is equivalent to db.\<collection\>.find({})
+- Aggregation stages are independent.
+- an aggregation expression refers to the name of the field in input documents `"$\<fieldName\>"`. Use the dot notation to reference a nested field.
+- Match uses standard MongoDB queries and supports all query operators.
+- Find with a query is equivalent to aggregate with one stage operator.
+
+Load the persons.json collection
+~~~js
+use MyDB
+db.persons.insertMany(
+    //paste the content of Persons.json here
+)
+~~~
+
+Syntaxes
+
+`aggregate()` Documents during the aggregation process pass through an array of different sequential stages separated by comma.
+~~~js
+db.\<collection\>.aggregate(
+    [
+        \<stage1\>
+        ,\<stage2\>
+        ...
+        ,\<stageN\>
+    ]
+)
+~~~
+
+## Aggregtion stages
+
+Each stage starts from the stage operator
+~~~js
+{
+    $\<stageOperator\> : 
+    {
+        // key-value quey pairs
+    }
+}
+~~~
+
+### Overview of aggregation stage operators
+
+`$match` (01/08): filters document by certain queries. Match specific documents using query.
+~~~js
+//Syntax
+{
+    $match:
+    {
+        \<query\>
+    }
+}
+
+//Examples
+//Match all cities in new york
+{
+    $match:
+    {
+        city: "New York"
+    }
+}
+//Match all persons that are over 25 years old
+{
+    $match:
+    {
+        age: {$gt: 25}
+    }
+}
+
+//Match all woman that are over 25 years old
+{
+    $match:
+    {
+       $and: 
+       [
+            {gender: "female"}
+            ,{age: {$gt: 25}}
+        ]
+    }
+}
+
+//Retrieve active persons
+db.persons.aggregate(
+    [
+        {
+            $match:
+            {
+                isActive: true
+            }
+        }
+    ]
+)
+
+//Retrieve all documents which size of the tags array is 3
+db.persons.aggregate(
+    [
+        {
+            $match:
+            {
+                tags: {$size: 3}
+            }
+        }
+    ]
+)
+~~~
+
+`$group` (02/08): groups documents by certain criteria.
+
+
+`$project` (03/08): filters fields in the documents.
+
+
+`$sort` (04/08): sorts objects.
+
+
+`$count` (05/08): counts the number of objects or documents.
+
+
+`$limit` (06/08): limits the number of documents.
+
+
+`$skip` (07/08): skips a certain amount of documents.
+
+
+`$out` (08/08): writes the result of the aggregation into another collection.
+
