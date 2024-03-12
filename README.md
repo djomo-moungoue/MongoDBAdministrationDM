@@ -2528,6 +2528,8 @@ The aggregation process looks like a pipe which consists of subset of documents 
 - The sort stage is usually put after the match and group stages.
 - The project stage is usually after the match stage. It can be used to restructure documents by renaming existing fields and adding new fields.
 - `$limit` is usually used in sampled aggregation requests with $limit as first stage; after $sort to produce topN results
+- In the $group stage, unary operators can be used only in conjunction with accumulators.
+- $out writes resulting documents to the MongoDB collection. $out MUST be last stage in the pipeline. If output collection doesn't exist, it will be created automatically.
 
 
 
@@ -2835,19 +2837,156 @@ db.persons.aggregate([
 
 `$skip` (07/08): skips a certain amount of documents.
 
+### Accumulator logic
 
-`$out` (08/08): writes the result of the aggregation into another collection.
+Accumulators maintain state for each group of the documents
+~~~js
+//Syntax
+{
+    $\<accumulatorOperator\>: \<expression\>
+}
 
+Illustration
+- Input: Document1 { ... quantity: 5, age: 25 ...}, Document2 { ... quantity: 30, age: 25 ...}, Document3 { ... quantity: 45, age: 25 ...}
+- $group: {_id: "$age"}
+- Output: $sum {$sum: "$quantity"}
+~~~
 
-`$sum` (01/02):
+`$sum` (01/02): Sums numeric values for the documents in each group
+~~~js
+//Syntax
+{
+    $sum: \<expression | number\>
+}
 
+{
+    total: {$sum: "$quantity"}
+}
 
-`$avg` (02/02):
+//count the documents in the group. It is a simple way to count number of the documents in each group.
+{count: {$sum: 1}}
+
+//Group documents by age and count the number of documents in each group
+db.persons.aggregate([
+    {
+        $group:{
+            _id: "$tags"
+            ,count: {$sum: 1}
+        }
+    }
+])
+
+//Group documents by distinct tag and count the number of documents in each group
+db.persons.aggregate([
+    {
+        $unwind: "$tags"
+    }
+    ,{
+        $group:{
+            _id: "$tags"
+            ,count: {$sum: 1}
+        }
+    }
+])
+~~~
+
+`$avg` (02/02): Calculates the average value of the certain values in the documents for each group
+~~~js
+//Syntax
+{
+    $avg: \<expression\>
+}
+
+db.persons.aggregate([
+    {
+        $group: 
+        {
+            _id: "$eyeColor"
+            ,avgAge: {$avg: "$age"}
+        }
+    }
+])
+
+db.persons.aggregate([
+    {
+        $group: 
+        {
+            _id: "$eyeColor"
+            ,avgAge: 
+            {
+                $avg: { $round : ["$age", 2] }
+            }
+        }
+    }
+])
+~~~
+
+## Unary Operators
+They are usually used in the $project stage because it operates on each independent document. In the $group stage, unary operators can be used only in conjunction with accumulators.
+- `$type`: returns the BSON type of teh field's value
+- `$or`
+- `$and`
+- `$lt`
+- `$gt`
+- `$multiply`: multiplies two or mores values.
+
+~~~js
+//Syntax
+{
+    $type: \<expression\>
+}
+
+//Examples
+{$type: "$age"}
+{$type: "$name"}
+
+db.persons.aggregate([
+    {
+        $project:
+        {
+            name: 1
+            ,eyeColorType: {$type: "$eyeColor"}
+            ,ageType: {$type: "$age"}
+        }
+    }
+])
+~~~
+
+`$out` (08/08): writes the result of the aggregation into another collection. writes resulting documents to the MongoDB collection. $out MUST be last stage in the pipeline. If output collection doesn't exist, it will be created automatically.
+~~~js
+//Syntax
+{
+    $out: "<outputCollectionName>"
+}
+
+//Examples
+{
+    $out: "newCollection"
+}
+
+//Documents from the $group stage will be written to the collection "aggregationResults"
+db.persons.aggregate([
+    {
+        $group:
+        {
+            _id: 
+            {
+                age: "$age"
+                ,eyeColor: "$eyeColor"
+            }
+        }
+    }
+    ,{
+        $out: "aggregationResults"
+    }
+])
+~~~
 
 `allowDiskTrue: true` is an option that can be used to ask MongoDB to write stages data to the temporal files instead of RAM, because:
 - all aggregation stages can use maximum 100 MB of RAM
 - the server will return error if RAM limit is exceeded
 - Usage: db.persons.aggregate([], {allowDiskUse: true})
+
 
 
 
