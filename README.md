@@ -2995,6 +2995,9 @@ db.persons.aggregate([
 - Index stores sorted field values
 - If appropriate index exists, MongoDB performs only index scan (IXSCAN)
 - Indexes are created by key containing key-value pairs, where value is the sort order, 1 for ascending and -1 for descending order. They are stored along with the collection data in the MongoDB server.
+- _id_ index it unique although the unique key doesn't appear in the output
+- The index on a collection's field must be unique
+- Query using regex always scan all documents even if there is an index on the field queried.
 
 `Default _id index`
 - {_id: 1} is the default index in each MongoDB collection
@@ -3035,8 +3038,9 @@ What field(s) should you use to create a collection index?
 - To sum up, it depends on the design of your front-end application.
 
 ### Create New Indexes
-
 Write resulting documents to the MongoDB collection
+
+Syntax
 ~~~js
 //Syntax
 db.\<collection\>.createIndex
@@ -3047,7 +3051,700 @@ db.\<collection\>.createIndex
     ,\<options\>
 )
 
+//Index creation options
+
+//create index in the background. Other operations will not be blocked. This option is appropriate for large collections in production database
+{background: true}
+
+//create unique index. The fields' values must be unique across collections (or the collection???).
+{unique: true}
+
+//Specify custom name for the index.
+{name: "<IndexName>"}
+~~~
+
+Examples
+~~~js
+//create new index by field age. Sort it in ascending order.
+db.persons.createIndex({age: 1})
+
+//create new index by field name. Sort it in ascending order.
+db.persons.createIndex({name: 1})
+
+//Clean the collection to remove duplicate indexes
+db.persons.find({}).count()
+db.persons.deleteMany({})
+db.persons.find({}).count()
+
+// Create an unique index on the index field of the persons collection
+db.persons.createIndex(
+    {index: 1} //index field in ascending order
+    ,{unique: true} //distinct index field values required
+)
+
+db.persons.getIndexes()
+/*OUTPUT
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { index: 1 }, name: 'index_1', unique: true }
+]
+*/
+
+// Create an index on the name field of the persons collection. It wil happen in the background.
+db.persons.createIndex(
+    {name: 1} //name field in ascending order
+    ,{background: true} //background process
+)
+
+db.persons.getIndexes()
+/*OUTPUT
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { index: 1 }, name: 'index_1', unique: true },
+  { v: 2, key: { name: 1 }, name: 'name_1', background: true }
+]
+*/
+
+// Create an custom named index on the age field of the persons collection. It wil happen in the background.
+db.persons.createIndex(
+    {age: 1} //age field in ascending order
+    ,{name: "customAgeIndex"} //background process
+)
+
+db.persons.getIndexes()
+/*OUTPUT
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { index: 1 }, name: 'index_1', unique: true },
+  { v: 2, key: { name: 1 }, name: 'name_1', background: true },
+  { v: 2, key: { age: 1 }, name: 'customAgeIndex' }
+]
+*/
+~~~
+
+Analyze query performance by using the `explain()` method. It returns information about the query
+~~~js
+//Syntax
+
+//Standard explain method
+db.\<collection\>.explain().\<method\>
+
+//Extended explain method
+db.\<collection\>.explain("executionStats").\<method\>
+
 //Examples
+
+//Lookup the performance of this find query
+db.persons.explain().find(
+    {
+        "age": {$gt: 25}
+    }
+)
+
+//Alternative syntax
+db.persons.find(
+    {
+        "age": {$gt: 25}
+    }
+).explain()
+/*OUTPUT
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'MyDB.persons',
+    indexFilterSet: false,
+    parsedQuery: {
+      age: {
+        '$gt': 25
+      }
+    },
+    queryHash: 'B18E568A',
+    planCacheKey: 'FDDFD434',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: {
+          age: 1
+        },
+        indexName: 'customAgeIndex',
+        isMultiKey: false,
+        multiKeyPaths: {
+          age: []
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          age: [
+            '(25, inf.0]'
+          ]
+        }
+      }
+    },
+    rejectedPlans: []
+  },
+  command: {
+    find: 'persons',
+    filter: {
+      age: {
+        '$gt': 25
+      }
+    },
+    '$db': 'MyDB'
+  },
+  serverInfo: {
+    host: 'LAPTOP-JSB53U7K',
+    port: 27017,
+    version: '6.0.6',
+    gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600
+  },
+  ok: 1
+}
+*/
+
+db.persons.explain().aggregate([
+    {
+        "$group": {_id: "$country"}
+    }
+])
+/*OUTPUT
+{
+  explainVersion: '2',
+  queryPlanner: {
+    namespace: 'MyDB.persons',
+    indexFilterSet: false,
+    parsedQuery: {},
+    queryHash: '0E9762A5',
+    planCacheKey: '0E9762A5',
+    optimizedPipeline: true,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      queryPlan: {
+        stage: 'GROUP',
+        planNodeId: 2,
+        inputStage: {
+          stage: 'COLLSCAN',
+          planNodeId: 1,
+          filter: {},
+          direction: 'forward'
+        }
+      },
+      slotBasedPlan: {
+        slots: '$$RESULT=s8 env: { s2 = Nothing (SEARCH_META), s3 = 1710329563348 (NOW), s1 = TimeZoneDatabase(Etc/UCT...America/Coral_Harbour) (timeZoneDB) }',
+        stages: '[2] mkbson s8 [_id = s7] true false \n' +
+          '[2] group [s7] [] \n' +
+          '[2] project [s7 = fillEmpty (s6, null)] \n' +
+          '[2] project [s6 = getField (s4, "country")] \n' +
+          '[1] scan s4 s5 none none none none [] @"07c148e0-003c-465e-8e1a-ac2c2a6d1874" true false '
+      }
+    },
+    rejectedPlans: []
+  },
+  command: {
+    aggregate: 'persons',
+    pipeline: [
+      {
+        '$group': {
+          _id: '$country'
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'MyDB'
+  },
+  serverInfo: {
+    host: 'LAPTOP-JSB53U7K',
+    port: 27017,
+    version: '6.0.6',
+    gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600
+  },
+  ok: 1
+}
+*/
+
+db.persons.find(
+    {
+        "age": {$gt: 25}
+    }
+).explain("executionStats")
+/*OUTPUT
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'MyDB.persons',
+    indexFilterSet: false,
+    parsedQuery: {
+      age: {
+        '$gt': 25
+      }
+    },
+    queryHash: 'B18E568A',
+    planCacheKey: 'FDDFD434',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: {
+          age: 1
+        },
+        indexName: 'customAgeIndex',
+        isMultiKey: false,
+        multiKeyPaths: {
+          age: []
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          age: [
+            '(25, inf.0]'
+          ]
+        }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 692,
+    executionTimeMillis: 9,
+    totalKeysExamined: 692,
+    totalDocsExamined: 692,
+    executionStages: {
+      stage: 'FETCH',
+      nReturned: 692,
+      executionTimeMillisEstimate: 0,
+      works: 693,
+      advanced: 692,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      docsExamined: 692,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        nReturned: 692,
+        executionTimeMillisEstimate: 0, //Estimated runtime
+        works: 693,
+        advanced: 692,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 1,
+        keyPattern: {
+          age: 1
+        },
+        indexName: 'customAgeIndex',
+        isMultiKey: false,
+        multiKeyPaths: {
+          age: []
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          age: [
+            '(25, inf.0]'
+          ]
+        },
+        keysExamined: 692,
+        seeks: 1,
+        dupsTested: 0,
+        dupsDropped: 0
+      }
+    }
+  },
+  command: {
+    find: 'persons',
+    filter: {
+      age: {
+        '$gt': 25
+      }
+    },
+    '$db': 'MyDB'
+  },
+  serverInfo: {
+    host: 'LAPTOP-JSB53U7K',
+    port: 27017,
+    version: '6.0.6',
+    gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600
+  },
+  ok: 1
+}
+*/
+
+db.persons.aggregate([
+    {
+        "$group": {_id: "$country"}
+    }
+]).explain("executionStats")
+/*OUTPUT
+{
+  explainVersion: '2',
+  queryPlanner: {
+    namespace: 'MyDB.persons',
+    indexFilterSet: false,
+    parsedQuery: {},
+    queryHash: '0E9762A5',
+    planCacheKey: '0E9762A5',
+    optimizedPipeline: true,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      queryPlan: {
+        stage: 'GROUP',
+        planNodeId: 2,
+        inputStage: {
+          stage: 'COLLSCAN',
+          planNodeId: 1,
+          filter: {},
+          direction: 'forward'
+        }
+      },
+      slotBasedPlan: {
+        slots: '$$RESULT=s8 env: { s2 = Nothing (SEARCH_META), s3 = 1710329923196 (NOW), s1 = TimeZoneDatabase(Etc/UCT...America/Coral_Harbour) (timeZoneDB) }',
+        stages: '[2] mkbson s8 [_id = s7] true false \n' +
+          '[2] group [s7] [] \n' +
+          '[2] project [s7 = fillEmpty (s6, null)] \n' +
+          '[2] project [s6 = getField (s4, "country")] \n' +
+          '[1] scan s4 s5 none none none none [] @"07c148e0-003c-465e-8e1a-ac2c2a6d1874" true false '
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 1, // One document matches
+    executionTimeMillis: 3,
+    totalKeysExamined: 0, //No index on the field queried
+    totalDocsExamined: 1000, //All documents of the collection scanned
+    executionStages: {
+      stage: 'mkbson',
+      planNodeId: 2,
+      nReturned: 1,
+      executionTimeMillisEstimate: 3,
+      opens: 1,
+      closes: 1,
+      saveState: 1,
+      restoreState: 1,
+      isEOF: 1,
+      objSlot: 8,
+      fields: [],
+      projectFields: [
+        '_id'
+      ],
+      projectSlots: [
+        7
+      ],
+      forceNewObject: true,
+      returnOldObject: false,
+      inputStage: {
+        stage: 'group',
+        planNodeId: 2,
+        nReturned: 1,
+        executionTimeMillisEstimate: 3,
+        opens: 1,
+        closes: 1,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 1,
+        groupBySlots: [
+          7
+        ],
+        usedDisk: false,
+        numSpills: 0,
+        spilledRecords: 0,
+        spilledDataStorageSize: 0,
+        inputStage: {
+          stage: 'project',
+          planNodeId: 2,
+          nReturned: 1000,
+          executionTimeMillisEstimate: 3,
+          opens: 1,
+          closes: 1,
+          saveState: 1,
+          restoreState: 1,
+          isEOF: 1,
+          projections: {
+            '7': 'fillEmpty (s6, null) '
+          },
+          inputStage: {
+            stage: 'project',
+            planNodeId: 2,
+            nReturned: 1000,
+            executionTimeMillisEstimate: 3,
+            opens: 1,
+            closes: 1,
+            saveState: 1,
+            restoreState: 1,
+            isEOF: 1,
+            projections: {
+              '6': 'getField (s4, "country") '
+            },
+            inputStage: {
+              stage: 'scan',
+              planNodeId: 1,
+              nReturned: 1000,
+              executionTimeMillisEstimate: 3, //Estimated runtime
+              opens: 1,
+              closes: 1,
+              saveState: 1,
+              restoreState: 1,
+              isEOF: 1,
+              numReads: 1000,
+              recordSlot: 4,
+              recordIdSlot: 5,
+              fields: [],
+              outputSlots: []
+            }
+          }
+        }
+      }
+    }
+  },
+  command: {
+    aggregate: 'persons',
+    pipeline: [
+      {
+        '$group': {
+          _id: '$country'
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'MyDB'
+  },
+  serverInfo: {
+    host: 'LAPTOP-JSB53U7K',
+    port: 27017,
+    version: '6.0.6',
+    gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600
+  },
+  ok: 1
+}
+*/
+
+db.persons.find({name: /al/i}).explain("executionStats")
+/*
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'MyDB.persons',
+    indexFilterSet: false,
+    parsedQuery: {
+      name: BSONRegExp('al', 'i')
+    },
+    queryHash: '501B9A8A',
+    planCacheKey: '862AB41F',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        filter: {
+          name: BSONRegExp('al', 'i')
+        },
+        keyPattern: {
+          name: 1
+        },
+        indexName: 'name_1',
+        isMultiKey: false,
+        multiKeyPaths: {
+          name: []
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          name: [
+            '["", {})',
+            '[/al/i, /al/i]'
+          ]
+        }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 122,
+    executionTimeMillis: 33,
+    totalKeysExamined: 1000,
+    totalDocsExamined: 122,
+    executionStages: {
+      stage: 'FETCH',
+      nReturned: 122,
+      executionTimeMillisEstimate: 23,
+      works: 1001,
+      advanced: 122,
+      needTime: 878,
+      needYield: 0,
+      saveState: 1,
+      restoreState: 1,
+      isEOF: 1,
+      docsExamined: 122,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        filter: {
+          name: BSONRegExp('al', 'i')
+        },
+        nReturned: 122,
+        executionTimeMillisEstimate: 23,
+        works: 1001,
+        advanced: 122,
+        needTime: 878,
+        needYield: 0,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 1,
+        keyPattern: {
+          name: 1
+        },
+        indexName: 'name_1',
+        isMultiKey: false,
+        multiKeyPaths: {
+          name: []
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          name: [
+            '["", {})',
+            '[/al/i, /al/i]'
+          ]
+        },
+        keysExamined: 1000,
+        seeks: 1,
+        dupsTested: 0,
+        dupsDropped: 0
+      }
+    }
+  },
+  command: {
+    find: 'persons',
+    filter: {
+      name: BSONRegExp('al', 'i')
+    },
+    '$db': 'MyDB'
+  },
+  serverInfo: {
+    host: 'LAPTOP-JSB53U7K',
+    port: 27017,
+    version: '6.0.6',
+    gitVersion: '26b4851a412cc8b9b4a18cdb6cd0f9f642e06aa7'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600
+  },
+  ok: 1
+}
+*/
+~~~
+
+### Delete Existing Indexes
+~~~js
+db.persons.getIndexes()
+/*OUTPUT
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { index: 1 }, name: 'index_1', unique: true },
+  { v: 2, key: { name: 1 }, name: 'name_1', background: true },
+  { v: 2, key: { age: 1 }, name: 'customAgeIndex' }
+]
+*/
+
+//Delete indexes on the field index in the person collection
+db.persons.dropIndex(
+    {
+        index: 1
+    }
+)
+/*
+{ nIndexesWas: 4, ok: 1 }
+*/
+
+db.persons.getIndexes()
+/*OUTPUT
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { name: 1 }, name: 'name_1', background: true },
+  { v: 2, key: { age: 1 }, name: 'customAgeIndex' }
+]
+*/
 
 ~~~
 
