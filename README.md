@@ -3856,9 +3856,9 @@ Examples
 mongoexport --uri 'mongodb://root:root@localhost:27017'
 
 //Export data from the persons collection located in the local MyDB database and store those data in the file persons.json created on the local computer.
-mongoexport --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json
+mongoexport --uri 'mongodb://root:root@localhost:27017' --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json
 
-mongoexport --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json --query '{index: 3}'
+mongoexport --uri 'mongodb://root:root@localhost:27017' --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json --query '{index: 3}'
 ~~~
 
 
