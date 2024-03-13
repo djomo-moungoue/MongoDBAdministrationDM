@@ -3750,22 +3750,80 @@ db.persons.getIndexes()
 # MongoDB Utilities
 These utilities are not part of MongoDB Shell. They are independent and separated from MongoDB Shell
 
-`mongoexport` (1/6):
+`mongoexport - mongoimport` (1/4): used to export or import collection data in extended JSON format.
+
+`mongoexport`
+- exports MongoDB collection data in JSON or CSV format
+- uses the strict mode extended JSON format. It means type information will be preserved using key-value pairs.
+
+Syntaxes
+~~~js
+/*EXPORT DATA
+--host: hostname of the remote server
+--db: database where you want to export data from
+--collection: collection where you want to export data from
+--out: name of the file that will be created on your local system and where exported data will be written to
+--jsonArray option wil export data as array of JSON objects. This option doesn't require any argument.
+*/
+//(REMOTE)
+mongoexport --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --db \<database\> --collection \<collection\> --out \<filename\>
+
+//(LOCAL)
+mongoexport  --db \<database\> --collection \<collection\> --out \<filename\>
+
+//(LOCAL jsonArray)
+mongoexport  --db \<database\> --collection \<collection\> --out \<filename\> --jsonArray
+
+//(LOCAL CSV)
+mongoexport  --db \<database\> --collection \<collection\> --out \<filename\> --type=csv 
+
+//(LOCAL with Query)
+mongoexport  --db \<database\> --collection \<collection\> --out \<filename\>  --query '{\<query\>}' 
+
+/*IMPORT DATA
+--host: hostname of the remote server
+--db: database where you want to import data to
+--NewCollectionName: collection where data will be stored
+--file: name of the file that contains data to import
+--jsonArray option wil export data as array of JSON objects. This option doesn't require any argument.
+Note: MongoDB wil produce error if you will try to insert document with duplicate unique index value.
+*/
+//(REMOTE)
+mongoimport --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --db \<database\> --collection \<collection\> --file \<filename\>
+
+//(LOCAL)
+mongoimport  --db \<database\> --collection \<collection\> --file \<filename\>
+
+//(LOCAL jsonArray)
+mongoimport  --db \<database\> --collection \<collection\> --file \<filename\> --jsonArray
+
+//(LOCAL CSV)
+mongoimport  --db \<database\> --collection \<collection\> --file \<filename\> --type=csv 
+~~~
+
+Examples
+~~~js
+//Export data from the persons collection located in the local MyDB database and store those data in the file persons.json created on the local computer.
+mongoexport --host "mongodb://127.0.0.1:27017" --username root --password root --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json
+
+mongoexport --host 'mongodb://127.0.0.1:27017' --username root --password root --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json --query '{index: 3}'
+~~~
 
 
-`mongoimport` (2/6):
+`mongodump - mongorestore` (2/4): used to dump or restore collection data in BSON format.
 
 
-`mongodump` (3/6):
+~~~js
+
+~~
+
+`mongostat` (3/4):
 
 
-`mongorestore` (4/6):
+`mongotop` (4/4):
+~~~js
 
-
-`mongostat` (5/6):
-
-
-`mongotop` (6/6):
+~~~
 
 
 
