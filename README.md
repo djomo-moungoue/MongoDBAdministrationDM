@@ -1,6 +1,6 @@
 ![MongoDB](./Images/MongoDB.jpg)
 
-Udemy Complete MongoDB Administration Guide Tutorial
+Complete MongoDB Administration Guide Tutorial
 
 ![MongoDB Administration Certificate Of Completion Udemy](./Images/MongoDBAdministrationCertificateOfCompletionUdemy.jpg)
 
@@ -3813,21 +3813,33 @@ mongoexport --host 'mongodb://127.0.0.1:27017' --username root --password root -
 ~~~
 
 
-`mongodump - mongorestore` (2/4): used to dump or restore collection data in BSON format.
+`mongodump - mongorestore` (2/4): used to dump or restore collection data in BSON format. 
+
+`mongodump`
+- exports data in binary format. It exports all indexes along with collections.
+- wihout --db option, all databases except 'local' will be dumped
+
+`mongorestore`
+- Binary import of the MongoDB backup
+- indexes will be re-created
 
 Syntax
 ~~~js
 /*DUMP DATA
 --host: hostname of the remote server
+--db: specific database to dump
+--collection: sepecific collection to dump
  argument.
+ --out: directory name where dump result will be stored. If you omit this option, a dump directory named 'dump' will be automatically created
+ --archive and --gzip to export to a compressed archived
 */
+//(LOCAL) dump all databases on the local mongodb server
+mongodump
+
 //(REMOTE)
 mongodump --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
 
-//(LOCAL)
-mongodump
-
-//(REMOTE specific DB and Collection)
+//(REMOTE specific DB and Collection) dump specific databases and specific collections
 mongodump --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --db \<dumpDatabase\> --collection \<dumpCollection\> --out \<directoryName\>
 
 //(REMOTE to Archive)
@@ -3835,20 +3847,20 @@ mongodump --host \<hostname\> --username \<username\> --password \<password\> --
 
 /*DRESTORE DATA
 --host: hostname of the remote server
- argument.
+--dir: directory containing dump data. If omitted MongoDB will look for the folder named 'dump'
+--archive and --gzip to export to a compressed archived
 */
+//(LOCAL) retore data from the dump folder to the local MongoDB server.
+mongorestore
+
 //(REMOTE)
 mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
-
-//(LOCAL)
-mongorestore
 
 //(REMOTE from specific directory)
 mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --dir \<directoryName\>
 
 //(REMOTE from Archive)
 mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --archive=\<fileName\> --gzip
-
 ~~
 
 `mongostat` (3/4): MongoDB real-time statistics. Easily monitor mongodb performance in real time.
