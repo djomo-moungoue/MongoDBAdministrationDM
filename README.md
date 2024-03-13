@@ -3745,8 +3745,29 @@ db.persons.getIndexes()
   { v: 2, key: { age: 1 }, name: 'customAgeIndex' }
 ]
 */
-
 ~~~
+
+# MongoDB Utilities
+These utilities are not part of MongoDB Shell. They are independent and separated from MongoDB Shell
+
+`mongoexport` (1/6):
+
+
+`mongoimport` (2/6):
+
+
+`mongodump` (3/6):
+
+
+`mongorestore` (4/6):
+
+
+`mongostat` (5/6):
+
+
+`mongotop` (6/6):
+
+
 
 
 
