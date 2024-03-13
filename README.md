@@ -2987,6 +2987,70 @@ db.persons.aggregate([
 - the server will return error if RAM limit is exceeded
 - Usage: db.persons.aggregate([], {allowDiskUse: true})
 
+# Indexes
+
+:memo: Memo:
+- Indexes improve MongoDB query execution
+- Without index whole collection must be scanned (COLLSCAN)
+- Index stores sorted field values
+- If appropriate index exists, MongoDB performs only index scan (IXSCAN)
+- Indexes are created by key containing key-value pairs, where value is the sort order, 1 for ascending and -1 for descending order. They are stored along with the collection data in the MongoDB server.
+
+`Default _id index`
+- {_id: 1} is the default index in each MongoDB collection
+- The name of this index is `_id_`
+- The default _id index is unique
+- You cannot delete underscore id index.
+
+Example of the default underscore id index
+~~~js
+[
+    {
+        "v": 2, //verion 2
+        "key": {
+            "_id": 1 //ascending order
+        },
+        "name": "_id_",
+        "ns": "MyDB.persons" //namespace database MyDB and collection persons
+    }
+    , ...
+]
+~~~
+
+`getIndexes()`: returns current indexes for certain collection
+~~~js
+//Syntax
+use \<DatabaseName\>
+db.\<CollectionName\>.getIndexes()
+
+//Examples
+use MyDB
+db.persons.getIndexes()
+~~~
+
+## Manage Indexes
+What field(s) should you use to create a collection index?
+- Field(s) that has(have) distinct values
+- and/or field(s) that you mostly use to query data in the collection.
+- To sum up, it depends on the design of your front-end application.
+
+### Create New Indexes
+
+Write resulting documents to the MongoDB collection
+~~~js
+//Syntax
+db.\<collection\>.createIndex
+(
+    {
+        \<KeyName\>: [-1 | 1]
+    }
+    ,\<options\>
+)
+
+//Examples
+
+~~~
+
 
 
 
