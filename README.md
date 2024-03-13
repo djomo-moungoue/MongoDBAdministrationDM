@@ -3753,6 +3753,53 @@ db.persons.getIndexes()
 # MongoDB Utilities
 These utilities are not part of MongoDB Shell. They are independent and separated from MongoDB Shell
 
+## Setup MongoDB Utility Tools
+
+~~~js
+winget search --name mongodb
+/*
+Name                             Id                        Version  Source
+---------------------------------------------------------------------------
+MongoDB                          MongoDB.Server            6.0.6    winget
+NoSQLBooster for MongoDB         NoSQLBooster.NoSQLBooster 8.1.7    winget
+MongoDB Shell                    MongoDB.Shell             1.10.1   winget
+MongoDB CLI                      MongoDB.MongoDBCLI        1.30.0   winget
+MongoDB Atlas CLI                MongoDB.MongoDBAtlasCLI   1.5.1    winget
+MongoDB Tools                    MongoDB.DatabaseTools     100.7.3  winget
+MongoDB Compass Readonly         MongoDB.Compass.Readonly  1.42.2.0 winget
+MongoDB Compass Isolated Edition MongoDB.Compass.Isolated  1.42.2.0 winget
+MongoDB Compass                  MongoDB.Compass.Full      1.42.2.0 winget
+MongoDB Compass Community        MongoDB.Compass.Community 1.41.0   winget
+*/
+
+winget install --id MongoDB.DatabaseTools --exact --source winget --silent
+/*
+Found MongoDB Tools [MongoDB.DatabaseTools] Version 100.7.3
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://fastdl.mongodb.org/tools/db/mongodb-database-tools-windows-x86_64-100.7.3.msi
+  ██████████████████████████████  58.0 MB / 58.0 MB
+Successfully verified installer hash
+Starting package install...
+Successfully installed
+*/
+~~~
+
+Add the path: C:\Program Files\MongoDB\Tools\100\bin to the Windows environment variables
+
+Open a Powershell and run:
+~~~ps1
+mongoexport --version
+<#>
+mongoexport version: 100.7.3
+git version: ad89a1c6dbe283012012cf0e5f4cb7fb1fcdf75d
+Go version: go1.19.10
+   os: windows
+   arch: amd64
+   compiler: gc
+#>
+~~~
+
 `mongoexport - mongoimport` (1/4): used to export or import collection data in extended JSON format.
 
 `mongoexport`
@@ -3806,10 +3853,12 @@ mongoimport  --db \<database\> --collection \<collection\> --file \<filename\> -
 
 Examples
 ~~~js
-//Export data from the persons collection located in the local MyDB database and store those data in the file persons.json created on the local computer.
-mongoexport --host "mongodb://127.0.0.1:27017" --username root --password root --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json
+mongoexport --uri 'mongodb://root:root@localhost:27017'
 
-mongoexport --host 'mongodb://127.0.0.1:27017' --username root --password root --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json --query '{index: 3}'
+//Export data from the persons collection located in the local MyDB database and store those data in the file persons.json created on the local computer.
+mongoexport --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json
+
+mongoexport --authenticationDatabase admin --db MyDB --collection persons --out PersonsExported.json --query '{index: 3}'
 ~~~
 
 
