@@ -1,5 +1,8 @@
-# MongoDBAdministrationDM
+![MongoDB](./Images/MongoDB.jpg)
+
 Udemy Complete MongoDB Administration Guide Tutorial
+
+![MongoDB Administration Certificate Of Completion Udemy](./Images/MongoDBAdministrationCertificateOfCompletionUdemy.jpg)
 
 ## Introduction 
 
@@ -1363,7 +1366,7 @@ db.getCollection("Cursor").find().batchSize(30)
 - So doesn't set the batch size too small.
 
 Right click on the stream with the biggest length, Follow / TCP Stream. You can observe on the following picture that the MongoDB send 30 documents to the MongoDB client at a time:
-![MongoDB Batch Size Inspection Using Wireshark](MongoDBBatchSizeInspectionUsingWireshark.JPG)
+![MongoDB Batch Size Inspection Using Wireshark](./Images/MongoDBBatchSizeInspectionUsingWireshark.JPG)
 
 ## Query MongoDB
 
@@ -3812,17 +3815,61 @@ mongoexport --host 'mongodb://127.0.0.1:27017' --username root --password root -
 
 `mongodump - mongorestore` (2/4): used to dump or restore collection data in BSON format.
 
-
+Syntax
 ~~~js
+/*DUMP DATA
+--host: hostname of the remote server
+ argument.
+*/
+//(REMOTE)
+mongodump --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
+
+//(LOCAL)
+mongodump
+
+//(REMOTE specific DB and Collection)
+mongodump --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --db \<dumpDatabase\> --collection \<dumpCollection\> --out \<directoryName\>
+
+//(REMOTE to Archive)
+mongodump --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --db \<dumpDatabase\> --collection \<dumpCollection\> --archive=\<fileName\> --gzip
+
+/*DRESTORE DATA
+--host: hostname of the remote server
+ argument.
+*/
+//(REMOTE)
+mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
+
+//(LOCAL)
+mongorestore
+
+//(REMOTE from specific directory)
+mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --dir \<directoryName\>
+
+//(REMOTE from Archive)
+mongorestore --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\> --archive=\<fileName\> --gzip
 
 ~~
 
-`mongostat` (3/4):
-
-
-`mongotop` (4/4):
+`mongostat` (3/4): MongoDB real-time statistics. Easily monitor mongodb performance in real time.
 ~~~js
+//(LOCAL)
+mongostat
 
+//(REMOTE)
+mongostat --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
+~~~
+
+
+`mongotop` (4/4): Top MongoDB current read and write operations
+~~~js
+//(LOCAL)
+mongostop
+
+mongotop \<NumberOfSeconds\>
+
+//(REMOTE)
+mongotop --host \<hostname\> --username \<username\> --password \<password\> --authenticationDatabase \<authDb\>
 ~~~
 
 
